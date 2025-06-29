@@ -845,7 +845,5 @@ export default function IdentityAccess() {
         </div>
       </main>
     </>
-```javascript
   );
 }
-// Applying the changes to add functionality to the Security Groups Manage and Edit buttons.
