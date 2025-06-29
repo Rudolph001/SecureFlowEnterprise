@@ -216,10 +216,17 @@ Protected health information handling meets HIPAA standards.`
           doc.setTextColor(0, 0, 0);
           doc.setFont('helvetica', 'normal');
           yPos += 20;
-        } else {
-          // Regular content
-          lines.forEach((line: string, index: number) => {
+          
+          // Add the content under this section header
+          for (let i = 1; i < lines.length; i++) {
+            const line = lines[i];
             if (line.trim()) {
+              // Check if we need a new page
+              if (yPos > pageHeight - 30) {
+                doc.addPage();
+                yPos = margin;
+              }
+              
               doc.setFontSize(10);
               
               // Handle bullet points and checkmarks
@@ -241,11 +248,45 @@ Protected health information handling meets HIPAA standards.`
                 doc.setFont('helvetica', 'normal');
                 yPos = addWrappedText(line, margin, yPos, contentWidth, 10);
               }
-              yPos += 2;
+              yPos += 4;
+            }
+          }
+        } else {
+          // Regular content (non-section headers)
+          lines.forEach((line: string) => {
+            if (line.trim()) {
+              // Check if we need a new page
+              if (yPos > pageHeight - 30) {
+                doc.addPage();
+                yPos = margin;
+              }
+              
+              doc.setFontSize(10);
+              
+              // Handle bullet points and checkmarks
+              if (line.includes('•') || line.includes('✓') || line.includes('⚠')) {
+                doc.setFont('helvetica', 'normal');
+                yPos = addWrappedText(line, margin + 5, yPos, contentWidth - 10, 10);
+              } else if (line.includes(':') && !line.includes('Generated on')) {
+                // Key-value pairs
+                doc.setFont('helvetica', 'bold');
+                const [key, ...valueParts] = line.split(':');
+                doc.text(key + ':', margin, yPos);
+                doc.setFont('helvetica', 'normal');
+                if (valueParts.length > 0) {
+                  yPos = addWrappedText(valueParts.join(':'), margin + 60, yPos, contentWidth - 60, 10);
+                } else {
+                  yPos += 6;
+                }
+              } else {
+                doc.setFont('helvetica', 'normal');
+                yPos = addWrappedText(line, margin, yPos, contentWidth, 10);
+              }
+              yPos += 4;
             }
           });
         }
-        yPos += 5;
+        yPos += 8;
       }
     });
     
@@ -254,7 +295,7 @@ Protected health information handling meets HIPAA standards.`
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
     doc.text('SecureFlow Enterprise - Confidential Report', margin, footerY);
-    doc.text(`Page 1 of ${doc.internal.getNumberOfPages()}`, pageWidth - margin - 30, footerY);
+    doc.text('Page 1', pageWidth - margin - 30, footerY);
     
     return doc;
   };
