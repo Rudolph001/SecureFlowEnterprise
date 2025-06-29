@@ -128,7 +128,7 @@ export default function IdentityAccess() {
     const diffMs = now.getTime() - dateObj.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
-    
+
     if (diffDays > 0) return `${diffDays} days ago`;
     if (diffHours > 0) return `${diffHours} hours ago`;
     return 'Just now';
@@ -247,14 +247,91 @@ export default function IdentityAccess() {
                   </div>
                   <p className="text-sm text-blue-700 mb-3">C-level executives and senior leadership</p>
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm">
-                      <i className="fas fa-users mr-1"></i>
-                      Manage
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <i className="fas fa-edit mr-1"></i>
-                      Edit
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-users mr-1"></i>
+                          Manage
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Manage Executive Team Members</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label>Current Members</Label>
+                            <div className="space-y-2 mt-2">
+                              <div className="flex items-center justify-between p-2 border rounded">
+                                <span className="text-sm">John Doe (admin@acme.com)</span>
+                                <Button variant="outline" size="sm">Remove</Button>
+                              </div>
+                              <div className="flex items-center justify-between p-2 border rounded">
+                                <span className="text-sm">Sarah Johnson (sarah@acme.com)</span>
+                                <Button variant="outline" size="sm">Remove</Button>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <Label>Add New Member</Label>
+                            <div className="flex gap-2 mt-2">
+                              <Select>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select user" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="jane.smith@acme.com">Jane Smith</SelectItem>
+                                  <SelectItem value="mike.brown@acme.com">Mike Brown</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button>Add</Button>
+                            </div>
+                          </div>
+                          <Button className="w-full">Save Changes</Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-edit mr-1"></i>
+                          Edit
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Executive Team</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label>Group Name</Label>
+                            <Input defaultValue="Executive Team" />
+                          </div>
+                          <div>
+                            <Label>Description</Label>
+                            <Input defaultValue="C-level executives and senior leadership" />
+                          </div>
+                          <div>
+                            <Label>Permissions</Label>
+                            <div className="space-y-2 mt-2">
+                              <div className="flex items-center space-x-2">
+                                <Switch defaultChecked />
+                                <span className="text-sm">All Policy Management</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch defaultChecked />
+                                <span className="text-sm">User Management</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch />
+                                <span className="text-sm">System Configuration</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button className="w-full">Update Group</Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </CardContent>
               </Card>
@@ -267,14 +344,91 @@ export default function IdentityAccess() {
                   </div>
                   <p className="text-sm text-green-700 mb-3">Financial operations and accounting staff</p>
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm">
-                      <i className="fas fa-users mr-1"></i>
-                      Manage
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <i className="fas fa-edit mr-1"></i>
-                      Edit
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-users mr-1"></i>
+                          Manage
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Manage Executive Team Members</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label>Current Members</Label>
+                            <div className="space-y-2 mt-2">
+                              <div className="flex items-center justify-between p-2 border rounded">
+                                <span className="text-sm">John Doe (admin@acme.com)</span>
+                                <Button variant="outline" size="sm">Remove</Button>
+                              </div>
+                              <div className="flex items-center justify-between p-2 border rounded">
+                                <span className="text-sm">Sarah Johnson (sarah@acme.com)</span>
+                                <Button variant="outline" size="sm">Remove</Button>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <Label>Add New Member</Label>
+                            <div className="flex gap-2 mt-2">
+                              <Select>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select user" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="jane.smith@acme.com">Jane Smith</SelectItem>
+                                  <SelectItem value="mike.brown@acme.com">Mike Brown</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button>Add</Button>
+                            </div>
+                          </div>
+                          <Button className="w-full">Save Changes</Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-edit mr-1"></i>
+                          Edit
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Executive Team</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label>Group Name</Label>
+                            <Input defaultValue="Executive Team" />
+                          </div>
+                          <div>
+                            <Label>Description</Label>
+                            <Input defaultValue="C-level executives and senior leadership" />
+                          </div>
+                          <div>
+                            <Label>Permissions</Label>
+                            <div className="space-y-2 mt-2">
+                              <div className="flex items-center space-x-2">
+                                <Switch defaultChecked />
+                                <span className="text-sm">All Policy Management</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch defaultChecked />
+                                <span className="text-sm">User Management</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch />
+                                <span className="text-sm">System Configuration</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button className="w-full">Update Group</Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </CardContent>
               </Card>
@@ -287,14 +441,91 @@ export default function IdentityAccess() {
                   </div>
                   <p className="text-sm text-purple-700 mb-3">Information technology and security staff</p>
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm">
-                      <i className="fas fa-users mr-1"></i>
-                      Manage
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <i className="fas fa-edit mr-1"></i>
-                      Edit
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-users mr-1"></i>
+                          Manage
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Manage Executive Team Members</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label>Current Members</Label>
+                            <div className="space-y-2 mt-2">
+                              <div className="flex items-center justify-between p-2 border rounded">
+                                <span className="text-sm">John Doe (admin@acme.com)</span>
+                                <Button variant="outline" size="sm">Remove</Button>
+                              </div>
+                              <div className="flex items-center justify-between p-2 border rounded">
+                                <span className="text-sm">Sarah Johnson (sarah@acme.com)</span>
+                                <Button variant="outline" size="sm">Remove</Button>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <Label>Add New Member</Label>
+                            <div className="flex gap-2 mt-2">
+                              <Select>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select user" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="jane.smith@acme.com">Jane Smith</SelectItem>
+                                  <SelectItem value="mike.brown@acme.com">Mike Brown</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button>Add</Button>
+                            </div>
+                          </div>
+                          <Button className="w-full">Save Changes</Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-edit mr-1"></i>
+                          Edit
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Executive Team</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label>Group Name</Label>
+                            <Input defaultValue="Executive Team" />
+                          </div>
+                          <div>
+                            <Label>Description</Label>
+                            <Input defaultValue="C-level executives and senior leadership" />
+                          </div>
+                          <div>
+                            <Label>Permissions</Label>
+                            <div className="space-y-2 mt-2">
+                              <div className="flex items-center space-x-2">
+                                <Switch defaultChecked />
+                                <span className="text-sm">All Policy Management</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch defaultChecked />
+                                <span className="text-sm">User Management</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch />
+                                <span className="text-sm">System Configuration</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button className="w-full">Update Group</Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </CardContent>
               </Card>
@@ -392,7 +623,7 @@ export default function IdentityAccess() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
                       <i className={`${getRoleIcon(user.role)} ${getRoleColor(user.role)}`}></i>
@@ -400,7 +631,7 @@ export default function IdentityAccess() {
                         {user.role.replace('_', ' ').toUpperCase()}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center space-x-1">
                       {/* Show user's groups */}
                       {user.id === 1 && (
@@ -413,12 +644,12 @@ export default function IdentityAccess() {
                         <Badge variant="outline" className="text-xs bg-green-50 text-green-700">Finance</Badge>
                       )}
                     </div>
-                    
+
                     <Switch
                       checked={user.isActive}
                       onCheckedChange={() => toggleUserStatus(user)}
                     />
-                    
+
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="outline" size="sm">
@@ -445,7 +676,7 @@ export default function IdentityAccess() {
                               )}
                             </div>
                           </div>
-                          
+
                           <div>
                             <Label className="text-sm font-medium">Available Groups</Label>
                             <div className="space-y-2 mt-2">
@@ -463,12 +694,12 @@ export default function IdentityAccess() {
                               </div>
                             </div>
                           </div>
-                          
+
                           <Button className="w-full">Update Group Memberships</Button>
                         </div>
                       </DialogContent>
                     </Dialog>
-                    
+
                     <Button variant="outline" size="sm">
                       <i className="fas fa-edit"></i>
                     </Button>
@@ -614,5 +845,7 @@ export default function IdentityAccess() {
         </div>
       </main>
     </>
+```javascript
   );
 }
+// Applying the changes to add functionality to the Security Groups Manage and Edit buttons.
