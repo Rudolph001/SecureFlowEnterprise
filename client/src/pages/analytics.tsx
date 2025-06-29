@@ -7,8 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Analytics() {
+  const { toast } = useToast();
+  
   const { data: dashboardMetrics } = useQuery({
     queryKey: ['/api/dashboard/metrics'],
   });
@@ -20,6 +23,39 @@ export default function Analytics() {
   const { data: threatIntelligence } = useQuery({
     queryKey: ['/api/threat-intelligence'],
   });
+
+  const handleComplianceReport = (reportType: string) => {
+    const reportData = {
+      'GDPR': {
+        fileName: 'GDPR_Compliance_Report.pdf',
+        description: 'General Data Protection Regulation compliance report',
+        score: '99.1%'
+      },
+      'SOC 2': {
+        fileName: 'SOC2_Compliance_Report.pdf',
+        description: 'SOC 2 Type II compliance audit report',
+        score: '98.7%'
+      },
+      'HIPAA': {
+        fileName: 'HIPAA_Compliance_Report.pdf',
+        description: 'Health Insurance Portability and Accountability Act compliance report',
+        score: '96.8%'
+      }
+    };
+
+    const report = reportData[reportType as keyof typeof reportData];
+    
+    if (report) {
+      // Simulate report download
+      toast({
+        title: `${reportType} Report Generated`,
+        description: `${report.description} (Score: ${report.score}) has been generated and downloaded as ${report.fileName}`,
+      });
+      
+      // In a real application, this would trigger an actual file download
+      console.log(`Generating ${reportType} report:`, report);
+    }
+  };
 
   const analyticsMetrics = [
     {
@@ -563,15 +599,27 @@ export default function Analytics() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex-col hover:bg-blue-50"
+                    onClick={() => handleComplianceReport('GDPR')}
+                  >
                     <i className="fas fa-shield-alt text-xl mb-2"></i>
                     <span>GDPR Report</span>
                   </Button>
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex-col hover:bg-green-50"
+                    onClick={() => handleComplianceReport('SOC 2')}
+                  >
                     <i className="fas fa-certificate text-xl mb-2"></i>
                     <span>SOC 2 Report</span>
                   </Button>
-                  <Button variant="outline" className="h-20 flex-col">
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex-col hover:bg-purple-50"
+                    onClick={() => handleComplianceReport('HIPAA')}
+                  >
                     <i className="fas fa-medical-file text-xl mb-2"></i>
                     <span>HIPAA Report</span>
                   </Button>
