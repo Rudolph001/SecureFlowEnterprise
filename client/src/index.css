@@ -81,16 +81,27 @@
   }
 
   .secureflow-sidebar-item {
-    @apply flex items-center px-4 py-3 rounded-lg transition-colors;
+    @apply flex items-center px-4 py-3 mx-1 rounded-lg transition-all duration-200 ease-in-out;
   }
 
   .secureflow-sidebar-item:hover {
     background-color: var(--secureflow-sidebar-hover);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .secureflow-sidebar-item.active {
     background-color: var(--primary);
     color: white;
+  }
+
+  .secureflow-management-section {
+    @apply pt-6 border-t border-slate-700/50;
+  }
+
+  .secureflow-section-header {
+    @apply text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-1;
+    letter-spacing: 0.1em;
   }
 
   .secureflow-metric-card {

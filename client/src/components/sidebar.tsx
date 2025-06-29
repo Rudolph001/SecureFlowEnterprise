@@ -100,15 +100,15 @@ export default function Sidebar() {
         </div>
 
         {/* Management */}
-        <div className="pt-4">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
+        <div className="secureflow-management-section">
+          <p className="secureflow-section-header">
             Management
           </p>
           {managementItems.map((item) => (
             <Link key={item.path} href={item.path}>
               <a
                 className={cn(
-                  "tessian-sidebar-item",
+                  "secureflow-sidebar-item",
                   isActive(item.path) ? "active" : "text-slate-300 hover:text-white"
                 )}
               >
@@ -123,7 +123,7 @@ export default function Sidebar() {
       {/* User Profile */}
       <div className="px-4 py-4 border-t border-slate-700">
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-tessian-primary rounded-full flex items-center justify-center mr-3">
+          <div className="w-8 h-8 bg-secureflow-primary rounded-full flex items-center justify-center mr-3">
             <span className="text-sm font-medium">
               {authState.user?.firstName?.[0]}{authState.user?.lastName?.[0]}
             </span>
