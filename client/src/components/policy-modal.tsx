@@ -843,20 +843,46 @@ export default function PolicyModal({ children, editPolicy, onClose, isTemplate 
               <div className="space-y-3">
                 <Label className="text-base font-semibold">Actions</Label>
                 <div className="flex gap-2">
-                  <Input
-                    value={newAction}
-                    onChange={(e) => setNewAction(e.target.value)}
-                    placeholder="Add new action (e.g., block, alert_admin, quarantine)"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAction())}
-                  />
-                  <Button type="button" onClick={addAction} size="sm">
+                  <Select value={newAction} onValueChange={setNewAction}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select an action to add" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="block">Block - Prevent email from being sent</SelectItem>
+                      <SelectItem value="quarantine">Quarantine - Hold email for review</SelectItem>
+                      <SelectItem value="alert_admin">Alert Admin - Notify administrators</SelectItem>
+                      <SelectItem value="alert_security_team">Alert Security Team - Notify security personnel</SelectItem>
+                      <SelectItem value="warn_user">Warn User - Show warning to sender</SelectItem>
+                      <SelectItem value="require_approval">Require Approval - Need manager approval</SelectItem>
+                      <SelectItem value="encrypt_email">Encrypt Email - Apply encryption</SelectItem>
+                      <SelectItem value="add_warning_banner">Add Warning Banner - Insert security notice</SelectItem>
+                      <SelectItem value="log_event">Log Event - Record for audit trail</SelectItem>
+                      <SelectItem value="flag_for_review">Flag for Review - Mark for manual review</SelectItem>
+                      <SelectItem value="delay_delivery">Delay Delivery - Hold for specified time</SelectItem>
+                      <SelectItem value="redirect_to_sandbox">Redirect to Sandbox - Send to secure environment</SelectItem>
+                      <SelectItem value="strip_attachments">Strip Attachments - Remove file attachments</SelectItem>
+                      <SelectItem value="convert_to_pdf">Convert to PDF - Transform attachments</SelectItem>
+                      <SelectItem value="notify_recipient">Notify Recipient - Alert email recipient</SelectItem>
+                      <SelectItem value="notify_compliance">Notify Compliance - Alert compliance team</SelectItem>
+                      <SelectItem value="escalate_to_manager">Escalate to Manager - Notify user's manager</SelectItem>
+                      <SelectItem value="send_to_dlp_queue">Send to DLP Queue - Route to data loss prevention</SelectItem>
+                      <SelectItem value="apply_watermark">Apply Watermark - Add identification marks</SelectItem>
+                      <SelectItem value="create_incident">Create Incident - Generate security incident</SelectItem>
+                      <SelectItem value="update_threat_intel">Update Threat Intel - Feed threat intelligence</SelectItem>
+                      <SelectItem value="blacklist_sender">Blacklist Sender - Add sender to blocklist</SelectItem>
+                      <SelectItem value="whitelist_sender">Whitelist Sender - Add sender to allowlist</SelectItem>
+                      <SelectItem value="coaching_intervention">Coaching Intervention - Trigger user training</SelectItem>
+                      <SelectItem value="phishing_simulation">Phishing Simulation - Create training scenario</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button type="button" onClick={addAction} size="sm" disabled={!newAction}>
                     <i className="fas fa-plus"></i>
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {(formData.rules.actions || []).map((action, index) => (
                     <Badge key={index} variant="destructive" className="flex items-center gap-1">
-                      {action}
+                      {action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       <button
                         type="button"
                         onClick={() => removeAction(action)}
