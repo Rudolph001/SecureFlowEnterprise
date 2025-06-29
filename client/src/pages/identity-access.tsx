@@ -124,7 +124,8 @@ export default function IdentityAccess() {
 
   const formatLastLogin = (date: Date) => {
     const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
+    const dateObj = date instanceof Date ? date : new Date(date);
+    const diffMs = now.getTime() - dateObj.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
     
