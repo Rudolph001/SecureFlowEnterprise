@@ -1,44 +1,73 @@
 import { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 interface PolicyModalProps {
   children: React.ReactNode;
   editPolicy?: any;
-  onPolicyCreated?: () => void;
   onClose?: () => void;
-  isTemplate?: boolean; // New prop to distinguish template modals
+  isTemplate?: boolean;
 }
 
-export default function PolicyModal({ children, editPolicy, onPolicyCreated, onClose, isTemplate = false }: PolicyModalProps) {
+export default function PolicyModal({ children, editPolicy, onClose, isTemplate = false }: PolicyModalProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    type: "",
+    type: "dlp",
     description: "",
-    targetUsers: "all",
     severity: "medium",
+    targetUsers: { 
+      groups: ["all"],
+      roles: [] as string[],
+      departments: [] as string[],
+      specificUsers: [] as string[]
+    },
     rules: {
       conditions: [] as string[],
       actions: [] as string[],
       keywords: [] as string[],
+      riskThreshold: 0.7,
+      priority: "normal",
+      schedule: {
+        enabled: false,
+        days: [] as string[],
+        timeRange: { start: "09:00", end: "17:00" }
+      },
+      exceptions: [] as string[],
+      customRegex: [] as string[]
     },
+    isActive: true,
+    notifications: {
+      enabled: true,
+      recipients: [] as string[],
+      escalation: false,
+      channels: ["email"] as string[]
+    },
+    compliance: {
+      framework: "",
+      requirements: [] as string[]
+    }
   });
 
   const [newCondition, setNewCondition] = useState("");
   const [newAction, setNewAction] = useState("");
   const [newKeyword, setNewKeyword] = useState("");
+  const [newException, setNewException] = useState("");
+  const [newRegex, setNewRegex] = useState("");
+  const [newNotificationRecipient, setNewNotificationRecipient] = useState("");
+  const [activeTab, setActiveTab] = useState("basic");
 
   // Effect to populate form when editing
   useEffect(() => {
@@ -48,21 +77,45 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
       if (isTemplate && !open) {
         return; // Don't populate or open template modals automatically
       }
-      
+
       setFormData({
         name: editPolicy.name || "",
         type: editPolicy.type || "",
         description: editPolicy.description || "",
-        targetUsers: editPolicy.targetUsers?.groups?.includes('all') ? 'all' :
-                    editPolicy.targetUsers?.roles?.includes('executive') ? 'executive' : 'groups',
         severity: editPolicy.severity || "medium",
+        targetUsers: editPolicy.targetUsers || { 
+          groups: ["all"],
+          roles: [],
+          departments: [],
+          specificUsers: []
+        },
         rules: editPolicy.rules || {
           conditions: [],
           actions: [],
           keywords: [],
+          riskThreshold: 0.7,
+          priority: "normal",
+          schedule: {
+            enabled: false,
+            days: [],
+            timeRange: { start: "09:00", end: "17:00" }
+          },
+          exceptions: [],
+          customRegex: []
         },
+        isActive: editPolicy.isActive !== undefined ? editPolicy.isActive : true,
+        notifications: editPolicy.notifications || {
+          enabled: true,
+          recipients: [],
+          escalation: false,
+          channels: ["email"]
+        },
+        compliance: editPolicy.compliance || {
+          framework: "",
+          requirements: []
+        }
       });
-      
+
       // Auto-open for non-template modals (edit functionality)
       if (!isTemplate) {
         setOpen(true);
@@ -90,7 +143,6 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
       setOpen(false);
       resetForm();
       onClose?.();
-      onPolicyCreated?.();
     },
     onError: (error: any) => {
       toast({
@@ -104,88 +156,194 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
   const resetForm = () => {
     setFormData({
       name: "",
-      type: "",
+      type: "dlp",
       description: "",
-      targetUsers: "all",
       severity: "medium",
+      targetUsers: { 
+        groups: ["all"],
+        roles: [],
+        departments: [],
+        specificUsers: []
+      },
       rules: {
         conditions: [],
         actions: [],
         keywords: [],
+        riskThreshold: 0.7,
+        priority: "normal",
+        schedule: {
+          enabled: false,
+          days: [],
+          timeRange: { start: "09:00", end: "17:00" }
+        },
+        exceptions: [],
+        customRegex: []
       },
+      isActive: true,
+      notifications: {
+        enabled: true,
+        recipients: [],
+        escalation: false,
+        channels: ["email"]
+      },
+      compliance: {
+        framework: "",
+        requirements: []
+      }
     });
     setNewCondition("");
     setNewAction("");
     setNewKeyword("");
+    setNewException("");
+    setNewRegex("");
+    setNewNotificationRecipient("");
   };
 
   const addCondition = () => {
-    if (newCondition.trim() && !(formData.rules.conditions || []).includes(newCondition.trim())) {
-      setFormData({
-        ...formData,
+    if (newCondition && !formData.rules.conditions.includes(newCondition)) {
+      setFormData(prev => ({
+        ...prev,
         rules: {
-          ...formData.rules,
-          conditions: [...(formData.rules.conditions || []), newCondition.trim()]
+          ...prev.rules,
+          conditions: [...prev.rules.conditions, newCondition]
         }
-      });
+      }));
       setNewCondition("");
     }
   };
 
   const removeCondition = (condition: string) => {
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       rules: {
-        ...formData.rules,
-        conditions: (formData.rules.conditions || []).filter(c => c !== condition)
+        ...prev.rules,
+        conditions: prev.rules.conditions.filter(c => c !== condition)
       }
-    });
+    }));
   };
 
   const addAction = () => {
-    if (newAction.trim() && !(formData.rules.actions || []).includes(newAction.trim())) {
-      setFormData({
-        ...formData,
+    if (newAction && !formData.rules.actions.includes(newAction)) {
+      setFormData(prev => ({
+        ...prev,
         rules: {
-          ...formData.rules,
-          actions: [...(formData.rules.actions || []), newAction.trim()]
+          ...prev.rules,
+          actions: [...prev.rules.actions, newAction]
         }
-      });
+      }));
       setNewAction("");
     }
   };
 
   const removeAction = (action: string) => {
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       rules: {
-        ...formData.rules,
-        actions: (formData.rules.actions || []).filter(a => a !== action)
+        ...prev.rules,
+        actions: prev.rules.actions.filter(a => a !== action)
       }
-    });
+    }));
   };
 
   const addKeyword = () => {
-    if (newKeyword.trim() && !(formData.rules.keywords || []).includes(newKeyword.trim())) {
-      setFormData({
-        ...formData,
+    if (newKeyword && !formData.rules.keywords.includes(newKeyword)) {
+      setFormData(prev => ({
+        ...prev,
         rules: {
-          ...formData.rules,
-          keywords: [...(formData.rules.keywords || []), newKeyword.trim()]
+          ...prev.rules,
+          keywords: [...prev.rules.keywords, newKeyword]
         }
-      });
+      }));
       setNewKeyword("");
     }
   };
 
   const removeKeyword = (keyword: string) => {
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       rules: {
-        ...formData.rules,
-        keywords: (formData.rules.keywords || []).filter(k => k !== keyword)
+        ...prev.rules,
+        keywords: prev.rules.keywords.filter(k => k !== keyword)
       }
-    });
+    }));
+  };
+
+  const addException = () => {
+    if (newException && !formData.rules.exceptions.includes(newException)) {
+      setFormData(prev => ({
+        ...prev,
+        rules: {
+          ...prev.rules,
+          exceptions: [...prev.rules.exceptions, newException]
+        }
+      }));
+      setNewException("");
+    }
+  };
+
+  const removeException = (exception: string) => {
+    setFormData(prev => ({
+      ...prev,
+      rules: {
+        ...prev.rules,
+        exceptions: prev.rules.exceptions.filter(e => e !== exception)
+      }
+    }));
+  };
+
+  const addRegex = () => {
+    if (newRegex && !formData.rules.customRegex.includes(newRegex)) {
+      try {
+        new RegExp(newRegex); // Validate regex
+        setFormData(prev => ({
+          ...prev,
+          rules: {
+            ...prev.rules,
+            customRegex: [...prev.rules.customRegex, newRegex]
+          }
+        }));
+        setNewRegex("");
+      } catch (error) {
+        toast({
+          title: "Invalid Regex",
+          description: "Please enter a valid regular expression",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const removeRegex = (regex: string) => {
+    setFormData(prev => ({
+      ...prev,
+      rules: {
+        ...prev.rules,
+        customRegex: prev.rules.customRegex.filter(r => r !== regex)
+      }
+    }));
+  };
+
+  const addNotificationRecipient = () => {
+    if (newNotificationRecipient && !formData.notifications.recipients.includes(newNotificationRecipient)) {
+      setFormData(prev => ({
+        ...prev,
+        notifications: {
+          ...prev.notifications,
+          recipients: [...prev.notifications.recipients, newNotificationRecipient]
+        }
+      }));
+      setNewNotificationRecipient("");
+    }
+  };
+
+  const removeNotificationRecipient = (recipient: string) => {
+    setFormData(prev => ({
+      ...prev,
+      notifications: {
+        ...prev.notifications,
+        recipients: prev.notifications.recipients.filter(r => r !== recipient)
+      }
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -200,33 +358,8 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
       return;
     }
 
-    // Use the custom rules from the form, or fall back to defaults for new policies
-    const rules = editPolicy ? formData.rules : {
-      conditions: formData.rules.conditions.length > 0 ? formData.rules.conditions :
-                 formData.type === "dlp" ? ["contains_pii", "external_recipient"] :
-                 formData.type === "phishing" ? ["suspicious_sender", "malicious_link"] :
-                 formData.type === "executive_protection" ? ["executive_target", "suspicious_sender"] :
-                 ["behavioral_anomaly"],
-      actions: formData.rules.actions.length > 0 ? formData.rules.actions :
-              formData.type === "dlp" ? ["block", "alert_admin"] :
-              formData.type === "phishing" ? ["quarantine", "alert_security_team"] :
-              ["warn", "log_event"],
-      keywords: formData.rules.keywords.length > 0 ? formData.rules.keywords :
-               formData.type === "dlp" ? ["confidential", "ssn", "credit_card"] : [],
-    };
-
-    const targetUsers = formData.targetUsers === "all" ? { groups: ["all"] } :
-                       formData.targetUsers === "groups" ? { groups: ["specific"] } :
-                       { roles: ["executive"] };
-
-    savePolicyMutation.mutate({
-      ...formData,
-      rules,
-      targetUsers,
-    });
+    savePolicyMutation.mutate(formData);
   };
-
-  const targetUsers = formData.targetUsers;
 
   return (
     <Dialog open={open} onOpenChange={(newOpen) => {
@@ -239,19 +372,289 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editPolicy ? 'Edit Security Policy' : 'Create Security Policy'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Tabs defaultValue="basic" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="rules">Rules & Conditions</TabsTrigger>
+              <TabsTrigger value="advanced">Advanced</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="compliance">Compliance</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="basic" className="space-y-4">
+          <TabsContent value="advanced" className="space-y-6">
+            {/* Schedule Configuration */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Schedule & Timing</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={formData.rules.schedule.enabled}
+                    onCheckedChange={(checked) => setFormData(prev => ({
+                      ...prev,
+                      rules: {
+                        ...prev.rules,
+                        schedule: { ...prev.rules.schedule, enabled: checked }
+                      }
+                    }))}
+                  />
+                  <Label>Enable Schedule-based Policy</Label>
+                </div>
+
+                {formData.rules.schedule.enabled && (
+                  <div className="space-y-3 pl-6">
+                    <div>
+                      <Label className="text-sm font-medium">Active Days</Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                          <Badge
+                            key={day}
+                            variant={formData.rules.schedule.days.includes(day) ? "default" : "outline"}
+                            className="cursor-pointer"
+                            onClick={() => {
+                              const days = formData.rules.schedule.days.includes(day)
+                                ? formData.rules.schedule.days.filter(d => d !== day)
+                                : [...formData.rules.schedule.days, day];
+                              setFormData(prev => ({
+                                ...prev,
+                                rules: {
+                                  ...prev.rules,
+                                  schedule: { ...prev.rules.schedule, days }
+                                }
+                              }));
+                            }}
+                          >
+                            {day.substring(0, 3)}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Start Time</Label>
+                        <Input
+                          type="time"
+                          value={formData.rules.schedule.timeRange.start}
+                          onChange={(e) => setFormData(prev => ({
+                            ...prev,
+                            rules: {
+                              ...prev.rules,
+                              schedule: {
+                                ...prev.rules.schedule,
+                                timeRange: { ...prev.rules.schedule.timeRange, start: e.target.value }
+                              }
+                            }
+                          }))}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium">End Time</Label>
+                        <Input
+                          type="time"
+                          value={formData.rules.schedule.timeRange.end}
+                          onChange={(e) => setFormData(prev => ({
+                            ...prev,
+                            rules: {
+                              ...prev.rules,
+                              schedule: {
+                                ...prev.rules.schedule,
+                                timeRange: { ...prev.rules.schedule.timeRange, end: e.target.value }
+                              }
+                            }
+                          }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Exceptions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Policy Exceptions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={newException}
+                    onChange={(e) => setNewException(e.target.value)}
+                    placeholder="Add exception (e.g., specific domain, user group)"
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addException())}
+                  />
+                  <Button type="button" onClick={addException} size="sm">
+                    <i className="fas fa-plus"></i>
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(formData.rules.exceptions || []).map((exception, index) => (
+                    <Badge key={index} variant="outline" className="flex items-center gap-1">
+                      {exception}
+                      <button
+                        type="button"
+                        onClick={() => removeException(exception)}
+                        className="ml-1 text-xs hover:text-red-600"
+                      >
+                        ×
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-6">
+            {/* Notification Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Alert Configuration</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={formData.notifications.enabled}
+                    onCheckedChange={(checked) => setFormData(prev => ({
+                      ...prev,
+                      notifications: { ...prev.notifications, enabled: checked }
+                    }))}
+                  />
+                  <Label>Enable Notifications</Label>
+                </div>
+
+                {formData.notifications.enabled && (
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium">Notification Recipients</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={newNotificationRecipient}
+                          onChange={(e) => setNewNotificationRecipient(e.target.value)}
+                          placeholder="Add email address"
+                          onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addNotificationRecipient())}
+                        />
+                        <Button type="button" onClick={addNotificationRecipient} size="sm">
+                          <i className="fas fa-plus"></i>
+                        </Button>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {formData.notifications.recipients.map((recipient, index) => (
+                          <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                            {recipient}
+                            <button
+                              type="button"
+                              onClick={() => removeNotificationRecipient(recipient)}
+                              className="ml-1 text-xs hover:text-red-600"
+                            >
+                              ×
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">Notification Channels</Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {['email', 'slack', 'teams', 'webhook', 'sms'].map(channel => (
+                          <Badge
+                            key={channel}
+                            variant={formData.notifications.channels.includes(channel) ? "default" : "outline"}
+                            className="cursor-pointer"
+                            onClick={() => {
+                              const channels = formData.notifications.channels.includes(channel)
+                                ? formData.notifications.channels.filter(c => c !== channel)
+                                : [...formData.notifications.channels, channel];
+                              setFormData(prev => ({
+                                ...prev,
+                                notifications: { ...prev.notifications, channels }
+                              }));
+                            }}
+                          >
+                            <i className={`fas fa-${channel === 'email' ? 'envelope' : channel === 'slack' ? 'slack' : channel === 'teams' ? 'microsoft' : channel === 'webhook' ? 'link' : 'mobile'} mr-1`}></i>
+                            {channel.charAt(0).toUpperCase() + channel.slice(1)}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={formData.notifications.escalation}
+                        onCheckedChange={(checked) => setFormData(prev => ({
+                          ...prev,
+                          notifications: { ...prev.notifications, escalation: checked }
+                        }))}
+                      />
+                      <Label>Enable Escalation (notify after 15 minutes if unacknowledged)</Label>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="compliance" className="space-y-6">
+            {/* Compliance Framework */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Compliance Framework</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium">Regulatory Framework</Label>
+                  <Select 
+                    value={formData.compliance.framework} 
+                    onValueChange={(value) => setFormData(prev => ({
+                      ...prev,
+                      compliance: { ...prev.compliance, framework: value }
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select compliance framework" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gdpr">GDPR</SelectItem>
+                      <SelectItem value="ccpa">CCPA</SelectItem>
+                      <SelectItem value="hipaa">HIPAA</SelectItem>
+                      <SelectItem value="sox">SOX</SelectItem>
+                      <SelectItem value="pci_dss">PCI DSS</SelectItem>
+                      <SelectItem value="iso27001">ISO 27001</SelectItem>
+                      <SelectItem value="nist">NIST</SelectItem>
+                      <SelectItem value="custom">Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium">Compliance Requirements</Label>
+                  <Textarea
+                    placeholder="Enter specific compliance requirements this policy addresses..."
+                    value={formData.compliance.requirements.join('\n')}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      compliance: {
+                        ...prev.compliance,
+                        requirements: e.target.value.split('\n').filter(req => req.trim())
+                      }
+                    }))}
+                    rows={4}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="basic" className="space-y-4">
               <div>
                 <Label htmlFor="name">Policy Name *</Label>
                 <Input
@@ -291,9 +694,19 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
 
               <div>
                 <Label>Target Users</Label>
+                {/* RadioGroup to select target user type */}
                 <RadioGroup 
-                  value={formData.targetUsers} 
-                  onValueChange={(value) => setFormData({ ...formData, targetUsers: value })}
+                  defaultValue={formData.targetUsers.groups.includes('all') ? 'all' :
+                              formData.targetUsers.roles.length > 0 ? 'executive' : 'groups'}
+                  onValueChange={(value) => {
+                    const updatedTargetUsers = {
+                      groups: value === 'all' ? ['all'] : [],
+                      roles: value === 'executive' ? ['executive'] : [],
+                      departments: [],
+                      specificUsers: []
+                    };
+                    setFormData({ ...formData, targetUsers: updatedTargetUsers });
+                  }}
                   className="mt-2"
                 >
                   <div className="flex items-center space-x-2">
@@ -311,7 +724,8 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
                 </RadioGroup>
               </div>
 
-              {targetUsers === "groups" && (
+              {/* Conditionally render group selection based on target user type */}
+              {formData.targetUsers.groups && !formData.targetUsers.groups.includes('all') && (
                 <div>
                   <Label>Select Groups</Label>
                   <div className="space-y-2 mt-2 max-h-32 overflow-y-auto border border-gray-200 rounded p-2">
