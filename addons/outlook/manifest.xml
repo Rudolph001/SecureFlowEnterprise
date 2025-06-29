@@ -8,10 +8,10 @@
   <!-- Begin Basic Settings: Add-in metadata, used for all versions of Office unless override provided. -->
   <Id>12345678-1234-1234-1234-123456789012</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>Tessian Enterprise</ProviderName>
+  <ProviderName>SecureFlow Enterprise</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   
-  <DisplayName DefaultValue="Tessian Email Security" />
+  <DisplayName DefaultValue="SecureFlow Email Security" />
   <Description DefaultValue="Enterprise email security with real-time threat detection and user coaching" />
   <IconUrl DefaultValue="https://tessian-addon.azurewebsites.net/images/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://tessian-addon.azurewebsites.net/images/icon-80.png"/>
@@ -122,7 +122,7 @@
           <bt:Url id="WebViewRuntime.Url" DefaultValue="https://your-repl-name-username.replit.app/addons/outlook/warning-pane.html"/>
         </bt:Urls>
         <bt:ShortStrings>
-          <bt:String id="GroupLabel" DefaultValue="Tessian Security"/>
+          <bt:String id="GroupLabel" DefaultValue="SecureFlow Security"/>
           <bt:String id="TaskpaneButton.Label" DefaultValue="Security Check"/>
         </bt:ShortStrings>
         <bt:LongStrings>

@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    // Configuration
+    // SecureFlow Configuration
     const CONFIG = {
         apiEndpoint: 'https://your-repl-name-username.replit.app',
         apiKey: 'your-api-key-here',

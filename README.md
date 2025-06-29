@@ -1,6 +1,6 @@
-# Tessian Enterprise Email Security Platform
+# SecureFlow Enterprise Email Security Platform
 
-A comprehensive enterprise email security platform that replicates key features of the Tessian email security platform. This solution provides real-time email threat detection, data loss prevention, user coaching, and advanced behavioral analytics with cloud-native ML infrastructure.
+A comprehensive enterprise email security platform that provides real-time email threat detection, data loss prevention, user coaching, and advanced behavioral analytics with cloud-native ML infrastructure.
 
 ## 🚀 Features
 

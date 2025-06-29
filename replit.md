@@ -1,8 +1,8 @@
-# Tessian Enterprise Email Security Platform
+# SecureFlow Enterprise Email Security Platform
 
 ## Overview
 
-This is a comprehensive enterprise email security platform that replicates key features of the Tessian email security platform. The system provides real-time email threat detection, data loss prevention, phishing protection, and user coaching through multiple security modules. Built as a full-stack application with React frontend, Express/Node.js backend, and PostgreSQL database.
+This is a comprehensive enterprise email security platform providing advanced email security capabilities. The system provides real-time email threat detection, data loss prevention, phishing protection, and user coaching through multiple security modules. Built as a full-stack application with React frontend, Express/Node.js backend, and PostgreSQL database.
 
 ## System Architecture
 

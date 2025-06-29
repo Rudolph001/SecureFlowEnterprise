@@ -211,7 +211,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="p-4 border border-slate-200 rounded-lg hover:border-tessian-primary/30 transition-colors">
+              <div className="p-4 border border-slate-200 rounded-lg hover:border-secureflow-primary/30 transition-colors">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     <i className="fas fa-shield-check text-green-600"></i>
@@ -228,7 +228,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="p-4 border border-slate-200 rounded-lg hover:border-tessian-primary/30 transition-colors">
+              <div className="p-4 border border-slate-200 rounded-lg hover:border-secureflow-primary/30 transition-colors">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     <i className="fas fa-user-shield text-blue-600"></i>
@@ -245,7 +245,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="p-4 border border-slate-200 rounded-lg hover:border-tessian-primary/30 transition-colors">
+              <div className="p-4 border border-slate-200 rounded-lg hover:border-secureflow-primary/30 transition-colors">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     <i className="fas fa-graduation-cap text-purple-600"></i>

@@ -23,16 +23,17 @@
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
-  
-  /* Tessian-specific colors */
-  --tessian-primary: hsl(207, 90%, 54%);
-  --tessian-secondary: hsl(196, 79%, 45%);
-  --tessian-accent: hsl(42, 96%, 50%);
-  --tessian-success: hsl(142, 76%, 36%);
-  --tessian-warning: hsl(42, 96%, 50%);
-  --tessian-error: hsl(0, 84.2%, 60.2%);
-  --tessian-sidebar: hsl(222, 84%, 4.9%);
-  --tessian-sidebar-hover: hsl(220, 14.3%, 10%);
+
+  /* SecureFlow Brand Colors */
+    --secureflow-primary: 224 71% 4%;
+    --secureflow-primary-foreground: 210 20% 98%;
+  --secureflow-secondary: hsl(196, 79%, 45%);
+  --secureflow-accent: hsl(42, 96%, 50%);
+  --secureflow-success: hsl(142, 76%, 36%);
+  --secureflow-warning: hsl(42, 96%, 50%);
+  --secureflow-error: hsl(0, 84.2%, 60.2%);
+  --secureflow-sidebar: hsl(222, 84%, 4.9%);
+  --secureflow-sidebar-hover: hsl(220, 14.3%, 10%);
 }
 
 .dark {
@@ -75,7 +76,7 @@
 
 @layer components {
   .tessian-sidebar {
-    background-color: var(--tessian-sidebar);
+    background-color: var(--secureflow-sidebar);
     color: white;
   }
 
@@ -84,11 +85,11 @@
   }
 
   .tessian-sidebar-item:hover {
-    background-color: var(--tessian-sidebar-hover);
+    background-color: var(--secureflow-sidebar-hover);
   }
 
   .tessian-sidebar-item.active {
-    background-color: var(--tessian-primary);
+    background-color: var(--primary);
     color: white;
   }
 
@@ -96,23 +97,23 @@
     @apply bg-white rounded-xl shadow-sm border border-slate-200 p-6;
   }
 
-  .tessian-status-badge {
+  .secureflow-status-badge {
     @apply px-2 py-1 text-xs rounded-full font-medium;
   }
 
-  .tessian-status-badge.active {
+  .secureflow-status-badge.active {
     @apply bg-green-100 text-green-800;
   }
 
-  .tessian-status-badge.warning {
+  .secureflow-status-badge.warning {
     @apply bg-amber-100 text-amber-800;
   }
 
-  .tessian-status-badge.error {
+  .secureflow-status-badge.error {
     @apply bg-red-100 text-red-800;
   }
 
-  .tessian-status-badge.learning {
+  .secureflow-status-badge.learning {
     @apply bg-blue-100 text-blue-800;
   }
 
@@ -143,14 +144,14 @@
 
 @layer utilities {
   .text-tessian-primary {
-    color: var(--tessian-primary);
+    color: var(--secureflow-primary);
   }
 
   .bg-tessian-primary {
-    background-color: var(--tessian-primary);
+    background-color: var(--secureflow-primary);
   }
 
   .border-tessian-primary {
-    border-color: var(--tessian-primary);
+    border-color: var(--secureflow-primary);
   }
 }
