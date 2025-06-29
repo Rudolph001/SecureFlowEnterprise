@@ -1,0 +1,92 @@
+What's Missing or Underspecified
+🔐 1. Identity & Access Management (IAM)
+Missing:
+
+RBAC (Role-Based Access Control)
+
+SSO (SAML/OAuth2 for enterprise login)
+
+Admin vs. user privilege separation
+
+Why it matters: Essential for compliance, enterprise control, and audit integrity.
+
+🌩️ 2. Cloud-Native Deployment Infrastructure
+Missing:
+
+Kubernetes or Docker orchestration
+
+CI/CD pipelines (GitHub Actions, GitLab CI, etc.)
+
+Secrets management (Vault, AWS Secrets Manager)
+
+Why it matters: Without this, you can't reliably deploy, scale, or secure the platform across cloud environments.
+
+📤 3. Inline Email Enforcement (Mail Flow Control)
+Missing:
+
+Actual email intervention mechanisms (e.g., blocking/quarantining an outbound/inbound message before it’s delivered)
+
+Integration with Exchange Transport Rules / Gmail Routing Policies
+
+Why it matters: Tessian doesn’t just observe — it acts inline. You're missing the part that actually alters email delivery.
+
+🛠️ 4. Add-In Configuration Controls
+Missing:
+
+Silent vs. active warning mode toggles (per user, per policy)
+
+Centralized add-in configuration and telemetry
+
+Why it matters: Enterprise add-ins must be configurable at scale — not just installable.
+
+🧪 5. Automated Testing, Model Validation, and Retraining Pipelines
+Missing:
+
+Unit/integration testing for ML models
+
+Model drift detection and auto-retraining pipeline (possibly with MLflow or Kubeflow)
+
+Why it matters: Keeping models fresh and production-safe requires lifecycle management.
+
+📊 6. Threat Intelligence & Enrichment
+Missing:
+
+Integration with threat intel feeds (VirusTotal, AbuseIPDB, etc.)
+
+Entity enrichment (IP reputation, domain age, etc.)
+
+Why it matters: ML models alone won’t catch everything. Context from the outside world helps.
+
+🧠 7. Dynamic Learning & Feedback Loops
+Missing:
+
+User “Report phishing” feedback buttons
+
+Feedback ingestion pipelines to improve model accuracy
+
+Why it matters: Active learning from users helps reduce false positives and negatives over time.
+
+📦 8. Multi-Tenant Support (If SaaS Platform)
+Missing:
+
+Tenant isolation in data, policy, users, analytics
+
+Why it matters: If you intend to scale commercially, SaaS-style multi-tenant architecture is key.
+
+📈 9. Usage Analytics, Telemetry, and Licensing
+Missing:
+
+Admin usage metrics (e.g., blocked emails over time, most risky users)
+
+Licensing model & feature flag system
+
+Why it matters: Helpful for sales, product development, and internal reporting.
+
+🧰 10. Disaster Recovery & High Availability
+Missing:
+
+Backup & restore plan
+
+Load balancing and failover
+
+Why it matters: This is critical for enterprise environments that require 99.99% uptime.

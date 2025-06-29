@@ -1,0 +1,134 @@
+Build me a full-stack project that replicates key features of the Tessian email security platform. I want to detect risky email behavior, prevent data exfiltration, flag phishing, and provide inline warnings via email add-ins. The solution must include:
+
+---
+
+🔧 GENERAL OBJECTIVE:
+Create a system that integrates with Microsoft 365 (via Graph API + Journaling) and Google Workspace (via Gmail API), analyzes email behavior in real-time, detects threats, and offers user-facing warnings or silent tracking via add-ins. All alerts should optionally integrate with Splunk or a custom SIEM.
+
+---
+
+📁 FOLDER STRUCTURE:
+- `backend/` — FastAPI server for email ingestion, analysis, profiling
+  - `app.py`, `config.py`
+  - `models/anomaly_detector.py` — Detect misdirected emails, spoofing, phishing, exfil
+  - `services/email_parser.py` — Parse/journal emails from M365/Gmail
+  - `services/behavior_profile.py` — User behavior baselining
+  - `utils/risk_scoring.py` — Calculate and assign risk scores
+  - `api/endpoints.py` — REST API for dashboard, alerts, SIEM pushes
+
+- `frontend/` — React + TailwindCSS admin dashboard
+  - Dashboard to view user/email risk events, configure thresholds, view logs
+  - Pages: `Overview`, `User Activity`, `Alerts`, `Config`
+
+- `addons/` — Outlook and Gmail email client add-ins (fully working, not placeholders)
+  - `outlook/`
+    - `manifest.xml` — Outlook Add-in manifest file
+    - `warning-pane.html` — Add-in interface for real-time send-time warnings
+    - `taskpane.js` — JS logic for warning UI
+    - Support user warnings **or silent tracking** (configurable via manifest)
+  - `gmail/`
+    - `gmail-addon.js` — Google Workspace Add-on (Apps Script)
+    - Trigger on compose/send
+    - Show warnings if risky; otherwise log silently
+
+- `siem_integration/`
+  - `splunk_forwarder.py` — Push risk events via HTTP Event Collector or syslog
+
+- `database/`
+  - `init.sql` — Schema for email events, profiles, and alerts
+  - `behavior_profile.db` — SQLite fallback for testing
+
+- `.env.example` — Email API keys, thresholds, SIEM URLs
+- `Dockerfile` — Dev environment setup
+- `requirements.txt` — FastAPI, scikit-learn, pyjwt, etc.
+- `replit.nix` — For Python + Node.js compatibility in Replit
+- `README.md` — Include full usage instructions and architecture overview
+
+---
+
+📦 FUNCTIONAL REQUIREMENTS:
+- **Email Ingestion (via journaling, API, or webhook):**
+  - Pull/send metadata (to/from/to-address, subject, file types)
+  - Do not store email content permanently
+
+- **Behavior Analysis Engine:**
+  - Create baselines per user (common contacts, send volume, attachments)
+  - Detect:
+    - Misaddressed emails
+    - Unusual behavior (intern emailing a competitor)
+    - Spoofing (lookalike display names, domains)
+    - Data exfiltration (source code or client data to personal Gmail)
+    - Phishing (links, urgency, tone)
+
+- **Add-in Functionality (Outlook & Gmail):**
+  - Show inline warnings like:
+    - “You’ve never emailed this person before”
+    - “This contains confidential info being sent externally”
+  - Must support **Silent Tracking Mode**:
+    - Log behavior without any user warning or prompt
+    - Toggle silent vs. warning mode via settings or manifest
+  - Warnings and events must be sent back to the backend for logging
+
+- **SIEM/UEBA Integration:**
+  - Enrich and push email behavior events to Splunk or custom SIEM
+  - Include user ID, email metadata, risk score, event type
+
+---
+
+🛠️ TECH STACK:
+- Backend: Python (FastAPI), SQLite or PostgreSQL
+- Frontend: React + TailwindCSS
+- Add-ins: Office.js for Outlook, Google Apps Script for Gmail
+- ML: PyOD, Scikit-learn (can stub ML with logic-based rules)
+- Deployment: Docker-compatible, works on Replit
+
+---
+
+🔐 PRIVACY REQUIREMENTS:
+- No permanent storage of email body/content
+- Comply with GDPR / SOC 2 / ISO 27001 principles
+- Anonymize data post-analysis (if stored)
+- Include optional logging, auditing for admins
+
+---
+
+Please scaffold all components, generate sample starter code in each, and wire them together where possible. Include enough placeholder logic to simulate detection and logging for testing.
+🟩 Summary of What This Will Generate:
+✅ Backend: Email profiling and detection engine with FastAPI
+
+✅ Frontend: Admin dashboard (React + Tailwind)
+
+✅ Add-ons:
+
+Outlook add-in with manifest.xml + warning UI
+
+Gmail add-on in Apps Script
+
+Both support silent mode
+
+✅ SIEM forwarding
+
+✅ Placeholder logic for ML/behavior detection
+
+Let me know if you'd like:
+
+The Office Add-in manifest template right away
+
+Working compose-send Gmail add-on logic
+
+Actual risk scoring logic or rules
+
+A working test case for email behavior anomaly
+
+I'm ready to help you start building the real logic or plug it into Splunk or your UEBA platform.
+
+
+
+
+
+
+
+
+
+Ask ChatGPT
+
