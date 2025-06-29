@@ -52,13 +52,13 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-64 tessian-sidebar flex flex-col">
+    <div className="w-64 secureflow-sidebar flex flex-col">
       {/* Logo/Brand */}
       <div className="flex items-center px-6 py-4 border-b border-slate-700">
-        <div className="w-8 h-8 bg-tessian-primary rounded-lg flex items-center justify-center mr-3">
+        <div className="w-8 h-8 bg-secureflow-primary rounded-lg flex items-center justify-center mr-3">
           <i className="fas fa-shield-alt text-white text-lg"></i>
         </div>
-        <h1 className="text-xl font-bold">Tessian Enterprise</h1>
+        <h1 className="text-xl font-bold">SecureFlow Enterprise</h1>
       </div>
 
       {/* Navigation Menu */}
@@ -68,7 +68,7 @@ export default function Sidebar() {
           <Link key={item.path} href={item.path}>
             <a
               className={cn(
-                "tessian-sidebar-item",
+                "secureflow-sidebar-item",
                 isActive(item.path) ? "active" : "text-slate-300 hover:text-white"
               )}
             >
@@ -87,7 +87,7 @@ export default function Sidebar() {
             <Link key={module.path} href={module.path}>
               <a
                 className={cn(
-                  "tessian-sidebar-item",
+                  "secureflow-sidebar-item",
                   isActive(module.path) ? "active" : "text-slate-300 hover:text-white"
                 )}
               >

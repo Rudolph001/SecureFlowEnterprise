@@ -217,7 +217,7 @@ export default function Dashboard() {
                     <i className="fas fa-shield-check text-green-600"></i>
                     <h4 className="text-sm font-semibold text-slate-900">Data Loss Prevention</h4>
                   </div>
-                  <span className="tessian-status-badge active">Active</span>
+                  <span className="secureflow-status-badge active">Active</span>
                 </div>
                 <p className="text-sm text-slate-600 mb-3">
                   Prevents confidential data from being sent to external recipients
@@ -234,7 +234,7 @@ export default function Dashboard() {
                     <i className="fas fa-user-shield text-blue-600"></i>
                     <h4 className="text-sm font-semibold text-slate-900">Executive Protection</h4>
                   </div>
-                  <span className="tessian-status-badge active">Active</span>
+                  <span className="secureflow-status-badge active">Active</span>
                 </div>
                 <p className="text-sm text-slate-600 mb-3">
                   Enhanced protection for C-level executives against targeted attacks
@@ -251,7 +251,7 @@ export default function Dashboard() {
                     <i className="fas fa-graduation-cap text-purple-600"></i>
                     <h4 className="text-sm font-semibold text-slate-900">User Training</h4>
                   </div>
-                  <span className="tessian-status-badge learning">Learning</span>
+                  <span className="secureflow-status-badge learning">Learning</span>
                 </div>
                 <p className="text-sm text-slate-600 mb-3">
                   Adaptive training based on user behavior and threat landscape

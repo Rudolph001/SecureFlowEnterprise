@@ -75,25 +75,25 @@
 }
 
 @layer components {
-  .tessian-sidebar {
+  .secureflow-sidebar {
     background-color: var(--secureflow-sidebar);
     color: white;
   }
 
-  .tessian-sidebar-item {
+  .secureflow-sidebar-item {
     @apply flex items-center px-4 py-3 rounded-lg transition-colors;
   }
 
-  .tessian-sidebar-item:hover {
+  .secureflow-sidebar-item:hover {
     background-color: var(--secureflow-sidebar-hover);
   }
 
-  .tessian-sidebar-item.active {
+  .secureflow-sidebar-item.active {
     background-color: var(--primary);
     color: white;
   }
 
-  .tessian-metric-card {
+  .secureflow-metric-card {
     @apply bg-white rounded-xl shadow-sm border border-slate-200 p-6;
   }
 
@@ -117,23 +117,23 @@
     @apply bg-blue-100 text-blue-800;
   }
 
-  .tessian-threat-item {
+  .secureflow-threat-item {
     @apply flex items-start space-x-4 p-4 rounded-lg border;
   }
 
-  .tessian-threat-item.critical {
+  .secureflow-threat-item.critical {
     @apply bg-red-50 border-red-200;
   }
 
-  .tessian-threat-item.high {
+  .secureflow-threat-item.high {
     @apply bg-amber-50 border-amber-200;
   }
 
-  .tessian-threat-item.medium {
+  .secureflow-threat-item.medium {
     @apply bg-blue-50 border-blue-200;
   }
 
-  .tessian-threat-item.low {
+  .secureflow-threat-item.low {
     @apply bg-green-50 border-green-200;
   }
 
@@ -143,15 +143,15 @@
 }
 
 @layer utilities {
-  .text-tessian-primary {
+  .text-secureflow-primary {
     color: var(--secureflow-primary);
   }
 
-  .bg-tessian-primary {
+  .bg-secureflow-primary {
     background-color: var(--secureflow-primary);
   }
 
-  .border-tessian-primary {
+  .border-secureflow-primary {
     border-color: var(--secureflow-primary);
   }
 }
