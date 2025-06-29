@@ -41,7 +41,7 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
 
   // Effect to populate form when editing
   useEffect(() => {
-    if (editPolicy) {
+    if (editPolicy && open) {
       setFormData({
         name: editPolicy.name || "",
         type: editPolicy.type || "",
@@ -55,9 +55,8 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
           keywords: [],
         },
       });
-      setOpen(true);
     }
-  }, [editPolicy]);
+  }, [editPolicy, open]);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
