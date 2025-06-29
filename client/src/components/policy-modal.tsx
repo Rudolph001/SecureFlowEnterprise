@@ -397,19 +397,24 @@ export default function PolicyModal({ children, editPolicy, onClose, isTemplate 
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Switch
-                    checked={formData.rules.schedule.enabled}
+                    checked={formData.rules?.schedule?.enabled || false}
                     onCheckedChange={(checked) => setFormData(prev => ({
                       ...prev,
                       rules: {
                         ...prev.rules,
-                        schedule: { ...prev.rules.schedule, enabled: checked }
+                        schedule: { 
+                          ...prev.rules?.schedule,
+                          enabled: checked,
+                          days: prev.rules?.schedule?.days || [],
+                          timeRange: prev.rules?.schedule?.timeRange || { start: "09:00", end: "17:00" }
+                        }
                       }
                     }))}
                   />
                   <Label>Enable Schedule-based Policy</Label>
                 </div>
 
-                {formData.rules.schedule.enabled && (
+                {formData.rules?.schedule?.enabled && (
                   <div className="space-y-3 pl-6">
                     <div>
                       <Label className="text-sm font-medium">Active Days</Label>
@@ -417,17 +422,23 @@ export default function PolicyModal({ children, editPolicy, onClose, isTemplate 
                         {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
                           <Badge
                             key={day}
-                            variant={formData.rules.schedule.days.includes(day) ? "default" : "outline"}
+                            variant={(formData.rules?.schedule?.days || []).includes(day) ? "default" : "outline"}
                             className="cursor-pointer"
                             onClick={() => {
-                              const days = formData.rules.schedule.days.includes(day)
-                                ? formData.rules.schedule.days.filter(d => d !== day)
-                                : [...formData.rules.schedule.days, day];
+                              const currentDays = formData.rules?.schedule?.days || [];
+                              const days = currentDays.includes(day)
+                                ? currentDays.filter(d => d !== day)
+                                : [...currentDays, day];
                               setFormData(prev => ({
                                 ...prev,
                                 rules: {
                                   ...prev.rules,
-                                  schedule: { ...prev.rules.schedule, days }
+                                  schedule: { 
+                                    ...prev.rules?.schedule,
+                                    enabled: prev.rules?.schedule?.enabled || false,
+                                    days,
+                                    timeRange: prev.rules?.schedule?.timeRange || { start: "09:00", end: "17:00" }
+                                  }
                                 }
                               }));
                             }}
@@ -443,14 +454,20 @@ export default function PolicyModal({ children, editPolicy, onClose, isTemplate 
                         <Label className="text-sm font-medium">Start Time</Label>
                         <Input
                           type="time"
-                          value={formData.rules.schedule.timeRange.start}
+                          value={formData.rules?.schedule?.timeRange?.start || "09:00"}
                           onChange={(e) => setFormData(prev => ({
                             ...prev,
                             rules: {
                               ...prev.rules,
                               schedule: {
-                                ...prev.rules.schedule,
-                                timeRange: { ...prev.rules.schedule.timeRange, start: e.target.value }
+                                ...prev.rules?.schedule,
+                                enabled: prev.rules?.schedule?.enabled || false,
+                                days: prev.rules?.schedule?.days || [],
+                                timeRange: { 
+                                  ...prev.rules?.schedule?.timeRange, 
+                                  start: e.target.value,
+                                  end: prev.rules?.schedule?.timeRange?.end || "17:00"
+                                }
                               }
                             }
                           }))}
@@ -460,14 +477,20 @@ export default function PolicyModal({ children, editPolicy, onClose, isTemplate 
                         <Label className="text-sm font-medium">End Time</Label>
                         <Input
                           type="time"
-                          value={formData.rules.schedule.timeRange.end}
+                          value={formData.rules?.schedule?.timeRange?.end || "17:00"}
                           onChange={(e) => setFormData(prev => ({
                             ...prev,
                             rules: {
                               ...prev.rules,
                               schedule: {
-                                ...prev.rules.schedule,
-                                timeRange: { ...prev.rules.schedule.timeRange, end: e.target.value }
+                                ...prev.rules?.schedule,
+                                enabled: prev.rules?.schedule?.enabled || false,
+                                days: prev.rules?.schedule?.days || [],
+                                timeRange: { 
+                                  ...prev.rules?.schedule?.timeRange,
+                                  start: prev.rules?.schedule?.timeRange?.start || "09:00",
+                                  end: e.target.value
+                                }
                               }
                             }
                           }))}
