@@ -333,6 +333,7 @@ export default function PolicyBuilder() {
                   }
                 }}
                 onClose={() => setEditingPolicy(null)}
+                isTemplate={true}
               >
                 <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
                   <div className="text-center">
@@ -357,6 +358,7 @@ export default function PolicyBuilder() {
                   }
                 }}
                 onClose={() => setEditingPolicy(null)}
+                isTemplate={true}
               >
                 <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
                   <div className="text-center">
@@ -381,6 +383,7 @@ export default function PolicyBuilder() {
                   }
                 }}
                 onClose={() => setEditingPolicy(null)}
+                isTemplate={true}
               >
                 <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
                   <div className="text-center">
@@ -405,6 +408,7 @@ export default function PolicyBuilder() {
                   }
                 }}
                 onClose={() => setEditingPolicy(null)}
+                isTemplate={true}
               >
                 <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
                   <div className="text-center">

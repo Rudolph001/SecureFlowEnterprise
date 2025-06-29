@@ -18,9 +18,10 @@ interface PolicyModalProps {
   editPolicy?: any;
   onPolicyCreated?: () => void;
   onClose?: () => void;
+  isTemplate?: boolean; // New prop to distinguish template modals
 }
 
-export default function PolicyModal({ children, editPolicy, onPolicyCreated, onClose }: PolicyModalProps) {
+export default function PolicyModal({ children, editPolicy, onPolicyCreated, onClose, isTemplate = false }: PolicyModalProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -41,7 +42,13 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
 
   // Effect to populate form when editing
   useEffect(() => {
-    if (editPolicy && open) {
+    if (editPolicy) {
+      // For template modals, only populate when dialog is open
+      // For edit modals, auto-open and populate
+      if (isTemplate && !open) {
+        return; // Don't populate or open template modals automatically
+      }
+      
       setFormData({
         name: editPolicy.name || "",
         type: editPolicy.type || "",
@@ -55,8 +62,13 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
           keywords: [],
         },
       });
+      
+      // Auto-open for non-template modals (edit functionality)
+      if (!isTemplate) {
+        setOpen(true);
+      }
     }
-  }, [editPolicy, open]);
+  }, [editPolicy, open, isTemplate]);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
