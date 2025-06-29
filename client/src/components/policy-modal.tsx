@@ -120,12 +120,12 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
   };
 
   const addCondition = () => {
-    if (newCondition.trim() && !formData.rules.conditions.includes(newCondition.trim())) {
+    if (newCondition.trim() && !(formData.rules.conditions || []).includes(newCondition.trim())) {
       setFormData({
         ...formData,
         rules: {
           ...formData.rules,
-          conditions: [...formData.rules.conditions, newCondition.trim()]
+          conditions: [...(formData.rules.conditions || []), newCondition.trim()]
         }
       });
       setNewCondition("");
@@ -137,18 +137,18 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
       ...formData,
       rules: {
         ...formData.rules,
-        conditions: formData.rules.conditions.filter(c => c !== condition)
+        conditions: (formData.rules.conditions || []).filter(c => c !== condition)
       }
     });
   };
 
   const addAction = () => {
-    if (newAction.trim() && !formData.rules.actions.includes(newAction.trim())) {
+    if (newAction.trim() && !(formData.rules.actions || []).includes(newAction.trim())) {
       setFormData({
         ...formData,
         rules: {
           ...formData.rules,
-          actions: [...formData.rules.actions, newAction.trim()]
+          actions: [...(formData.rules.actions || []), newAction.trim()]
         }
       });
       setNewAction("");
@@ -160,18 +160,18 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
       ...formData,
       rules: {
         ...formData.rules,
-        actions: formData.rules.actions.filter(a => a !== action)
+        actions: (formData.rules.actions || []).filter(a => a !== action)
       }
     });
   };
 
   const addKeyword = () => {
-    if (newKeyword.trim() && !formData.rules.keywords.includes(newKeyword.trim())) {
+    if (newKeyword.trim() && !(formData.rules.keywords || []).includes(newKeyword.trim())) {
       setFormData({
         ...formData,
         rules: {
           ...formData.rules,
-          keywords: [...formData.rules.keywords, newKeyword.trim()]
+          keywords: [...(formData.rules.keywords || []), newKeyword.trim()]
         }
       });
       setNewKeyword("");
@@ -183,7 +183,7 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
       ...formData,
       rules: {
         ...formData.rules,
-        keywords: formData.rules.keywords.filter(k => k !== keyword)
+        keywords: (formData.rules.keywords || []).filter(k => k !== keyword)
       }
     });
   };
@@ -386,7 +386,7 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {formData.rules.conditions.map((condition, index) => (
+                  {(formData.rules.conditions || []).map((condition, index) => (
                     <Badge key={index} variant="secondary" className="flex items-center gap-1">
                       {condition}
                       <button
@@ -416,7 +416,7 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {formData.rules.actions.map((action, index) => (
+                  {(formData.rules.actions || []).map((action, index) => (
                     <Badge key={index} variant="destructive" className="flex items-center gap-1">
                       {action}
                       <button
@@ -446,7 +446,7 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {formData.rules.keywords.map((keyword, index) => (
+                  {(formData.rules.keywords || []).map((keyword, index) => (
                     <Badge key={index} variant="outline" className="flex items-center gap-1">
                       {keyword}
                       <button
