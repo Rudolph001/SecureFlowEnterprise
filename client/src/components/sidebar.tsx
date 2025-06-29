@@ -66,15 +66,15 @@ export default function Sidebar() {
         {/* Main Navigation */}
         {navigationItems.map((item) => (
           <Link key={item.path} href={item.path}>
-            <a
+            <div
               className={cn(
-                "secureflow-sidebar-item",
+                "secureflow-sidebar-item cursor-pointer",
                 isActive(item.path) ? "active" : "text-slate-300 hover:text-white"
               )}
             >
               <i className={cn(item.icon, "mr-3")}></i>
               <span>{item.label}</span>
-            </a>
+            </div>
           </Link>
         ))}
 
@@ -85,16 +85,16 @@ export default function Sidebar() {
           </p>
           {securityModules.map((module) => (
             <Link key={module.path} href={module.path}>
-              <a
+              <div
                 className={cn(
-                  "secureflow-sidebar-item",
+                  "secureflow-sidebar-item cursor-pointer",
                   isActive(module.path) ? "active" : "text-slate-300 hover:text-white"
                 )}
               >
                 <i className={cn(module.icon, "mr-3")}></i>
                 <span>{module.label}</span>
                 {getStatusBadge(module.status)}
-              </a>
+              </div>
             </Link>
           ))}
         </div>
@@ -106,15 +106,15 @@ export default function Sidebar() {
           </p>
           {managementItems.map((item) => (
             <Link key={item.path} href={item.path}>
-              <a
+              <div
                 className={cn(
-                  "secureflow-sidebar-item",
+                  "secureflow-sidebar-item cursor-pointer",
                   isActive(item.path) ? "active" : "text-slate-300 hover:text-white"
                 )}
               >
                 <i className={cn(item.icon, "mr-3")}></i>
                 <span>{item.label}</span>
-              </a>
+              </div>
             </Link>
           ))}
         </div>
