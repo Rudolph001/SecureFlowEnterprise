@@ -319,37 +319,101 @@ export default function PolicyBuilder() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
-                <div className="text-center">
-                  <i className="fas fa-shield-check text-2xl text-green-600 mb-2"></i>
-                  <h4 className="font-medium text-slate-900 mb-1">Data Loss Prevention</h4>
-                  <p className="text-sm text-slate-600">Prevent sensitive data exfiltration</p>
+              <PolicyModal 
+                editPolicy={{
+                  name: "Data Loss Prevention",
+                  type: "dlp",
+                  description: "Prevents confidential data from being sent to external recipients",
+                  severity: "high",
+                  targetUsers: { groups: ["all"] },
+                  rules: {
+                    conditions: ["contains_pii", "external_recipient", "sensitive_keywords"],
+                    actions: ["block", "alert_admin", "log_event"],
+                    keywords: ["confidential", "ssn", "credit_card", "bank_account"]
+                  }
+                }}
+                onClose={() => setEditingPolicy(null)}
+              >
+                <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
+                  <div className="text-center">
+                    <i className="fas fa-shield-check text-2xl text-green-600 mb-2"></i>
+                    <h4 className="font-medium text-slate-900 mb-1">Data Loss Prevention</h4>
+                    <p className="text-sm text-slate-600">Prevent sensitive data exfiltration</p>
+                  </div>
                 </div>
-              </div>
+              </PolicyModal>
               
-              <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
-                <div className="text-center">
-                  <i className="fas fa-fish text-2xl text-red-600 mb-2"></i>
-                  <h4 className="font-medium text-slate-900 mb-1">Anti-Phishing</h4>
-                  <p className="text-sm text-slate-600">Block phishing and malicious emails</p>
+              <PolicyModal 
+                editPolicy={{
+                  name: "Anti-Phishing Protection",
+                  type: "phishing",
+                  description: "Blocks phishing attempts and malicious emails from reaching users",
+                  severity: "critical",
+                  targetUsers: { groups: ["all"] },
+                  rules: {
+                    conditions: ["suspicious_sender", "malicious_link", "spoofed_domain"],
+                    actions: ["quarantine", "alert_security_team", "warn_user"],
+                    keywords: ["urgent", "click_here", "verify_account", "suspended"]
+                  }
+                }}
+                onClose={() => setEditingPolicy(null)}
+              >
+                <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
+                  <div className="text-center">
+                    <i className="fas fa-fish text-2xl text-red-600 mb-2"></i>
+                    <h4 className="font-medium text-slate-900 mb-1">Anti-Phishing</h4>
+                    <p className="text-sm text-slate-600">Block phishing and malicious emails</p>
+                  </div>
                 </div>
-              </div>
+              </PolicyModal>
               
-              <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
-                <div className="text-center">
-                  <i className="fas fa-user-shield text-2xl text-blue-600 mb-2"></i>
-                  <h4 className="font-medium text-slate-900 mb-1">Executive Protection</h4>
-                  <p className="text-sm text-slate-600">Enhanced security for leadership</p>
+              <PolicyModal 
+                editPolicy={{
+                  name: "Executive Protection",
+                  type: "executive_protection",
+                  description: "Enhanced security monitoring and protection for executive team members",
+                  severity: "high",
+                  targetUsers: { roles: ["executive"] },
+                  rules: {
+                    conditions: ["executive_target", "suspicious_sender", "external_meeting_request"],
+                    actions: ["enhanced_scanning", "alert_security_team", "require_approval"],
+                    keywords: ["meeting", "urgent", "confidential", "board"]
+                  }
+                }}
+                onClose={() => setEditingPolicy(null)}
+              >
+                <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
+                  <div className="text-center">
+                    <i className="fas fa-user-shield text-2xl text-blue-600 mb-2"></i>
+                    <h4 className="font-medium text-slate-900 mb-1">Executive Protection</h4>
+                    <p className="text-sm text-slate-600">Enhanced security for leadership</p>
+                  </div>
                 </div>
-              </div>
+              </PolicyModal>
               
-              <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
-                <div className="text-center">
-                  <i className="fas fa-brain text-2xl text-purple-600 mb-2"></i>
-                  <h4 className="font-medium text-slate-900 mb-1">Behavioral Analysis</h4>
-                  <p className="text-sm text-slate-600">AI-powered anomaly detection</p>
+              <PolicyModal 
+                editPolicy={{
+                  name: "Behavioral Analysis",
+                  type: "behavioral",
+                  description: "AI-powered detection of unusual email behavior patterns and anomalies",
+                  severity: "medium",
+                  targetUsers: { groups: ["all"] },
+                  rules: {
+                    conditions: ["behavioral_anomaly", "unusual_timing", "atypical_recipient"],
+                    actions: ["flag_for_review", "alert_admin", "log_event"],
+                    keywords: ["unusual", "anomaly", "pattern"]
+                  }
+                }}
+                onClose={() => setEditingPolicy(null)}
+              >
+                <div className="p-4 border border-dashed border-gray-300 rounded-lg hover:border-tessian-primary hover:bg-blue-50 transition-colors cursor-pointer">
+                  <div className="text-center">
+                    <i className="fas fa-brain text-2xl text-purple-600 mb-2"></i>
+                    <h4 className="font-medium text-slate-900 mb-1">Behavioral Analysis</h4>
+                    <p className="text-sm text-slate-600">AI-powered anomaly detection</p>
+                  </div>
                 </div>
-              </div>
+              </PolicyModal>
             </div>
           </CardContent>
         </Card>
