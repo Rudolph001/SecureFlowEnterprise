@@ -14,6 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 export default function PolicyBuilder() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [editingPolicy, setEditingPolicy] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -126,7 +127,10 @@ export default function PolicyBuilder() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Security Policies</CardTitle>
-              <PolicyModal>
+              <PolicyModal 
+                editPolicy={editingPolicy}
+                onClose={() => setEditingPolicy(null)}
+              >
                 <Button className="bg-tessian-primary hover:bg-tessian-primary/90">
                   <i className="fas fa-plus mr-2"></i>
                   Create Policy
@@ -210,7 +214,10 @@ export default function PolicyBuilder() {
                     ? "Try adjusting your search or filter criteria." 
                     : "Get started by creating your first security policy."}
                 </p>
-                <PolicyModal>
+                <PolicyModal 
+                  editPolicy={editingPolicy}
+                  onClose={() => setEditingPolicy(null)}
+                >
                   <Button className="bg-tessian-primary hover:bg-tessian-primary/90">
                     Create First Policy
                   </Button>
@@ -275,7 +282,11 @@ export default function PolicyBuilder() {
 
                   <div className="flex justify-between items-center mt-4 pt-4 border-t">
                     <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setEditingPolicy(policy)}
+                      >
                         <i className="fas fa-edit mr-1"></i>
                         Edit
                       </Button>

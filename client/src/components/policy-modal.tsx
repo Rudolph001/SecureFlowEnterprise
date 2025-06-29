@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,12 @@ import { apiRequest } from "@/lib/queryClient";
 
 interface PolicyModalProps {
   children: React.ReactNode;
+  editPolicy?: any;
   onPolicyCreated?: () => void;
+  onClose?: () => void;
 }
 
-export default function PolicyModal({ children, onPolicyCreated }: PolicyModalProps) {
+export default function PolicyModal({ children, editPolicy, onPolicyCreated, onClose }: PolicyModalProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -30,27 +32,52 @@ export default function PolicyModal({ children, onPolicyCreated }: PolicyModalPr
     },
   });
 
+  // Effect to populate form when editing
+  useEffect(() => {
+    if (editPolicy) {
+      setFormData({
+        name: editPolicy.name || "",
+        type: editPolicy.type || "",
+        description: editPolicy.description || "",
+        targetUsers: editPolicy.targetUsers?.groups?.includes('all') ? 'all' :
+                    editPolicy.targetUsers?.roles?.includes('executive') ? 'executive' : 'groups',
+        severity: editPolicy.severity || "medium",
+        rules: editPolicy.rules || {
+          conditions: [],
+          actions: [],
+          keywords: [],
+        },
+      });
+      setOpen(true);
+    }
+  }, [editPolicy]);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const createPolicyMutation = useMutation({
+  const savePolicyMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("POST", "/api/policies", data);
+      if (editPolicy) {
+        return apiRequest("PUT", `/api/policies/${editPolicy.id}`, data);
+      } else {
+        return apiRequest("POST", "/api/policies", data);
+      }
     },
     onSuccess: () => {
       toast({
-        title: "Policy Created",
-        description: "Security policy has been created successfully.",
+        title: editPolicy ? "Policy Updated" : "Policy Created",
+        description: `Security policy has been ${editPolicy ? 'updated' : 'created'} successfully.`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/policies"] });
       setOpen(false);
       resetForm();
+      onClose?.();
       onPolicyCreated?.();
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create policy.",
+        description: error.message || `Failed to ${editPolicy ? 'update' : 'create'} policy.`,
         variant: "destructive",
       });
     },
@@ -99,7 +126,7 @@ export default function PolicyModal({ children, onPolicyCreated }: PolicyModalPr
                        formData.targetUsers === "groups" ? { groups: ["specific"] } :
                        { roles: ["executive"] };
 
-    createPolicyMutation.mutate({
+    savePolicyMutation.mutate({
       ...formData,
       rules,
       targetUsers,
@@ -107,13 +134,19 @@ export default function PolicyModal({ children, onPolicyCreated }: PolicyModalPr
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      setOpen(newOpen);
+      if (!newOpen) {
+        onClose?.();
+        resetForm();
+      }
+    }}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Security Policy</DialogTitle>
+          <DialogTitle>{editPolicy ? 'Edit Security Policy' : 'Create Security Policy'}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -195,15 +228,22 @@ export default function PolicyModal({ children, onPolicyCreated }: PolicyModalPr
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                onClose?.();
+                resetForm();
+              }}
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
-              disabled={createPolicyMutation.isPending}
+              disabled={savePolicyMutation.isPending}
             >
-              {createPolicyMutation.isPending ? "Creating..." : "Create Policy"}
+              {savePolicyMutation.isPending ? 
+                (editPolicy ? "Updating..." : "Creating...") : 
+                (editPolicy ? "Update Policy" : "Create Policy")
+              }
             </Button>
           </div>
         </form>
