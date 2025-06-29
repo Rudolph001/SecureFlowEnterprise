@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { Switch } from "@/components/ui/switch";
 
 interface PolicyModalProps {
   children: React.ReactNode;
@@ -178,7 +179,7 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.type) {
       toast({
         title: "Validation Error",
@@ -214,6 +215,8 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
     });
   };
 
+  const targetUsers = formData.targetUsers;
+
   return (
     <Dialog open={open} onOpenChange={(newOpen) => {
       setOpen(newOpen);
@@ -229,14 +232,14 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
         <DialogHeader>
           <DialogTitle>{editPolicy ? 'Edit Security Policy' : 'Create Security Policy'}</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="rules">Rules & Conditions</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="basic" className="space-y-4">
               <div>
                 <Label htmlFor="name">Policy Name *</Label>
@@ -296,6 +299,49 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
                   </div>
                 </RadioGroup>
               </div>
+
+              {targetUsers === "groups" && (
+                <div>
+                  <Label>Select Groups</Label>
+                  <div className="space-y-2 mt-2 max-h-32 overflow-y-auto border border-gray-200 rounded p-2">
+                    <div className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                      <Switch />
+                      <div className="flex-1">
+                        <span className="text-sm font-medium">Executive Team</span>
+                        <p className="text-xs text-gray-500">C-level executives and senior leadership</p>
+                      </div>
+                      <Badge variant="outline" className="ml-auto">3 users</Badge>
+                    </div>
+                    <div className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                      <Switch />
+                      <div className="flex-1">
+                        <span className="text-sm font-medium">Finance Team</span>
+                        <p className="text-xs text-gray-500">Financial operations and accounting staff</p>
+                      </div>
+                      <Badge variant="outline" className="ml-auto">12 users</Badge>
+                    </div>
+                    <div className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                      <Switch />
+                      <div className="flex-1">
+                        <span className="text-sm font-medium">IT Team</span>
+                        <p className="text-xs text-gray-500">Information technology and security staff</p>
+                      </div>
+                      <Badge variant="outline" className="ml-auto">8 users</Badge>
+                    </div>
+                    <div className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                      <Switch />
+                      <div className="flex-1">
+                        <span className="text-sm font-medium">Marketing Team</span>
+                        <p className="text-xs text-gray-500">Marketing and communications staff</p>
+                      </div>
+                      <Badge variant="outline" className="ml-auto">15 users</Badge>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Selected groups will be targeted by this policy. Users can belong to multiple groups.
+                  </p>
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="severity">Severity Level</Label>

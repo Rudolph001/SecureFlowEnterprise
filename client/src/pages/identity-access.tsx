@@ -206,6 +206,102 @@ export default function IdentityAccess() {
           </Card>
         </div>
 
+        {/* Group Management */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Security Groups</CardTitle>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="mr-2">
+                    <i className="fas fa-users mr-2"></i>
+                    Create Group
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create Security Group</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Group Name</Label>
+                      <Input placeholder="e.g., Executive Team, Finance Team" />
+                    </div>
+                    <div>
+                      <Label>Description</Label>
+                      <Input placeholder="Group description" />
+                    </div>
+                    <Button className="w-full">Create Group</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <Card className="border-2 border-blue-200 bg-blue-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-blue-900">Executive Team</h4>
+                    <Badge variant="secondary">3 members</Badge>
+                  </div>
+                  <p className="text-sm text-blue-700 mb-3">C-level executives and senior leadership</p>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm">
+                      <i className="fas fa-users mr-1"></i>
+                      Manage
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <i className="fas fa-edit mr-1"></i>
+                      Edit
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-green-200 bg-green-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-green-900">Finance Team</h4>
+                    <Badge variant="secondary">12 members</Badge>
+                  </div>
+                  <p className="text-sm text-green-700 mb-3">Financial operations and accounting staff</p>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm">
+                      <i className="fas fa-users mr-1"></i>
+                      Manage
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <i className="fas fa-edit mr-1"></i>
+                      Edit
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-purple-200 bg-purple-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-purple-900">IT Team</h4>
+                    <Badge variant="secondary">8 members</Badge>
+                  </div>
+                  <p className="text-sm text-purple-700 mb-3">Information technology and security staff</p>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm">
+                      <i className="fas fa-users mr-1"></i>
+                      Manage
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <i className="fas fa-edit mr-1"></i>
+                      Edit
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* User Management */}
         <Card className="mb-6">
           <CardHeader>
@@ -305,10 +401,73 @@ export default function IdentityAccess() {
                       </Badge>
                     </div>
                     
+                    <div className="flex items-center space-x-1">
+                      {/* Show user's groups */}
+                      {user.id === 1 && (
+                        <>
+                          <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">Executive</Badge>
+                          <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700">IT Team</Badge>
+                        </>
+                      )}
+                      {user.id === 2 && (
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700">Finance</Badge>
+                      )}
+                    </div>
+                    
                     <Switch
                       checked={user.isActive}
                       onCheckedChange={() => toggleUserStatus(user)}
                     />
+                    
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <i className="fas fa-users mr-1"></i>
+                          Groups
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Manage User Groups - {user.firstName} {user.lastName}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label className="text-sm font-medium">Current Groups</Label>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {user.id === 1 && (
+                                <>
+                                  <Badge variant="secondary">Executive Team</Badge>
+                                  <Badge variant="secondary">IT Team</Badge>
+                                </>
+                              )}
+                              {user.id === 2 && (
+                                <Badge variant="secondary">Finance Team</Badge>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <Label className="text-sm font-medium">Available Groups</Label>
+                            <div className="space-y-2 mt-2">
+                              <div className="flex items-center space-x-2">
+                                <Switch />
+                                <span className="text-sm">Executive Team</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch />
+                                <span className="text-sm">Finance Team</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch />
+                                <span className="text-sm">IT Team</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <Button className="w-full">Update Group Memberships</Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                     
                     <Button variant="outline" size="sm">
                       <i className="fas fa-edit"></i>
