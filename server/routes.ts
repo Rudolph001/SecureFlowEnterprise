@@ -29,11 +29,11 @@ const requireRole = (roles: string[]) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    
+
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({ message: 'Insufficient permissions' });
     }
-    
+
     next();
   };
 };
@@ -44,7 +44,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { username, password } = req.body;
       const user = await storage.getUserByUsername(username);
-      
+
       if (!user || user.password !== password) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
@@ -124,12 +124,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
-      
+
       const policy = await storage.updatePolicy(id, updates);
       if (!policy) {
         return res.status(404).json({ message: 'Policy not found' });
       }
-      
+
       res.json(policy);
     } catch (error) {
       res.status(500).json({ message: 'Failed to update policy' });
@@ -140,11 +140,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deletePolicy(id);
-      
+
       if (!success) {
         return res.status(404).json({ message: 'Policy not found' });
       }
-      
+
       res.json({ message: 'Policy deleted successfully' });
     } catch (error) {
       res.status(500).json({ message: 'Failed to delete policy' });
@@ -203,11 +203,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const model = await storage.getMlModel(id);
-      
+
       if (!model) {
         return res.status(404).json({ message: 'Model not found' });
       }
-      
+
       res.json(model);
     } catch (error) {
       res.status(500).json({ message: 'Failed to fetch ML model' });
@@ -218,12 +218,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
-      
+
       const model = await storage.updateMlModel(id, updates);
       if (!model) {
         return res.status(404).json({ message: 'Model not found' });
       }
-      
+
       res.json(model);
     } catch (error) {
       res.status(500).json({ message: 'Failed to update ML model' });
@@ -255,12 +255,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
-      
+
       const alert = await storage.updateAlert(id, updates);
       if (!alert) {
         return res.status(404).json({ message: 'Alert not found' });
       }
-      
+
       res.json(alert);
     } catch (error) {
       res.status(500).json({ message: 'Failed to update alert' });
@@ -314,10 +314,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // This would forward events to SIEM systems like Splunk
       const { events } = req.body;
-      
+
       // Mock SIEM forwarding
       console.log('Forwarding events to SIEM:', events);
-      
+
       res.json({ message: 'Events forwarded to SIEM successfully', count: events?.length || 0 });
     } catch (error) {
       res.status(500).json({ message: 'Failed to forward events to SIEM' });
@@ -328,10 +328,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/addins/outlook/warning', async (req, res) => {
     try {
       const { messageId, recipient, riskScore, warningType } = req.body;
-      
+
       // Log the warning event
       console.log('Outlook add-in warning:', { messageId, recipient, riskScore, warningType });
-      
+
       res.json({ 
         showWarning: riskScore > 0.7,
         message: riskScore > 0.9 ? 'High risk email detected' : 'Potentially risky email',
@@ -345,10 +345,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/addins/gmail/warning', async (req, res) => {
     try {
       const { messageId, recipient, riskScore, warningType } = req.body;
-      
+
       // Log the warning event
       console.log('Gmail add-in warning:', { messageId, recipient, riskScore, warningType });
-      
+
       res.json({ 
         showWarning: riskScore > 0.7,
         message: riskScore > 0.9 ? 'High risk email detected' : 'Potentially risky email',
@@ -356,6 +356,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: 'Failed to process add-in warning' });
+    }
+  });
+
+  // Policy management
+  app.get("/api/policies", async (req, res) => {
+    try {
+      const tenantId = req.headers['x-tenant-id'] || '1';
+      const policies = await storage.getSecurityPoliciesByTenant(tenantId as string);
+      res.json(policies);
+    } catch (error) {
+      console.error('Error fetching policies:', error);
+      res.status(500).json({ message: "Failed to fetch policies" });
+    }
+  });
+
+  // Policy justification submission
+  app.post("/api/policies/justification", async (req, res) => {
+    try {
+      const { policyId, justification, emailData, userInfo } = req.body;
+
+      // Log the justification
+      const justificationLog = {
+        policyId,
+        userId: userInfo?.userId || 'unknown',
+        justification,
+        emailSubject: emailData?.subject || '',
+        emailRecipient: emailData?.to || '',
+        timestamp: new Date().toISOString(),
+        approved: true // Auto-approve with justification
+      };
+
+      // In a real implementation, you'd store this in a database
+      console.log('Policy justification submitted:', justificationLog);
+
+      // You could also trigger additional workflows here:
+      // - Notify compliance team
+      // - Log to audit trail
+      // - Send to external SIEM
+
+      res.json({ 
+        success: true, 
+        message: "Justification recorded and action approved",
+        logId: Date.now() // In real implementation, use proper ID
+      });
+    } catch (error) {
+      console.error('Error processing justification:', error);
+      res.status(500).json({ message: "Failed to process justification" });
     }
   });
 

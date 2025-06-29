@@ -41,6 +41,12 @@ export default function PolicyModal({ children, editPolicy, onClose, isTemplate 
       keywords: [] as string[],
       riskThreshold: 0.7,
       priority: "normal",
+      enforcementMode: "warn" as string,
+      justificationRules: {
+        minLength: 20,
+        forbiddenPatterns: [] as string[],
+        requireBusinessReason: false
+      },
       schedule: {
         enabled: false,
         days: [] as string[],
@@ -806,6 +812,97 @@ export default function PolicyModal({ children, editPolicy, onClose, isTemplate 
                   </SelectContent>
                 </Select>
               </div>
+
+              <div>
+                <Label htmlFor="enforcementMode">Enforcement Mode</Label>
+                <Select 
+                  value={formData.rules.enforcementMode || "warn"} 
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    rules: { ...prev.rules, enforcementMode: value }
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select enforcement mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="silent">Silent Tracking - Log activity without user notification</SelectItem>
+                    <SelectItem value="warn">Warning Display - Show policy information popup</SelectItem>
+                    <SelectItem value="justify">Require Justification - User must provide explanation</SelectItem>
+                    <SelectItem value="block">Block Action - Prevent action completely</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {formData.rules.enforcementMode === "justify" && (
+                <div className="space-y-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <Label className="text-sm font-medium text-blue-900">Justification Validation Settings</Label>
+                  
+                  <div>
+                    <Label className="text-xs text-blue-700">Minimum Character Length</Label>
+                    <Input
+                      type="number"
+                      min="10"
+                      max="500"
+                      value={formData.rules.justificationRules?.minLength || 20}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        rules: {
+                          ...prev.rules,
+                          justificationRules: {
+                            ...prev.rules.justificationRules,
+                            minLength: parseInt(e.target.value) || 20
+                          }
+                        }
+                      }))}
+                      placeholder="20"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-blue-700">Forbidden Patterns (one per line)</Label>
+                    <Textarea
+                      placeholder="Enter patterns to reject (e.g., '123', 'test', 'hello')&#10;Each pattern on a new line"
+                      value={(formData.rules.justificationRules?.forbiddenPatterns || []).join('\n')}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        rules: {
+                          ...prev.rules,
+                          justificationRules: {
+                            ...prev.rules.justificationRules,
+                            forbiddenPatterns: e.target.value.split('\n').filter(p => p.trim()),
+                            minLength: prev.rules.justificationRules?.minLength || 20
+                          }
+                        }
+                      }))}
+                      rows={3}
+                      className="text-xs"
+                    />
+                    <p className="text-xs text-blue-600 mt-1">
+                      Users won't be able to submit justifications containing these patterns
+                    </p>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      checked={formData.rules.justificationRules?.requireBusinessReason || false}
+                      onCheckedChange={(checked) => setFormData(prev => ({
+                        ...prev,
+                        rules: {
+                          ...prev.rules,
+                          justificationRules: {
+                            ...prev.rules.justificationRules,
+                            requireBusinessReason: checked,
+                            minLength: prev.rules.justificationRules?.minLength || 20,
+                            forbiddenPatterns: prev.rules.justificationRules?.forbiddenPatterns || []
+                          }
+                        }
+                      }))}
+                    />
+                    <Label className="text-xs text-blue-700">Require business-related keywords (business, client, project, etc.)</Label>
+                  </div>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="rules" className="space-y-4">

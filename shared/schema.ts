@@ -160,3 +160,36 @@ export type InsertMlModel = z.infer<typeof insertMlModelSchema>;
 export type InsertBehaviorProfile = z.infer<typeof insertBehaviorProfileSchema>;
 export type InsertAlert = z.infer<typeof insertAlertSchema>;
 export type InsertSystemMetric = z.infer<typeof insertSystemMetricSchema>;
+
+export interface SecurityPolicy {
+  id: number;
+  tenantId: string;
+  name: string;
+  description: string;
+  policyType: string;
+  targetUsers: any;
+  rules: {
+    conditions: string[];
+    actions: string[];
+    keywords: string[];
+    riskThreshold: number;
+    priority: string;
+    enforcementMode: "silent" | "warn" | "justify" | "block";
+    justificationRules?: {
+      minLength: number;
+      forbiddenPatterns: string[];
+      requireBusinessReason: boolean;
+    };
+    schedule?: {
+      enabled: boolean;
+      days: string[];
+      timeRange: { start: string; end: string };
+    };
+    exceptions: string[];
+    customRegex: string[];
+  };
+  isActive: boolean;
+  createdBy: number;
+  createdAt: Date;
+  updatedAt: Date;
+}

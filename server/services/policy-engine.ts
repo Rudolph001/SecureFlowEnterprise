@@ -107,12 +107,34 @@ export class PolicyEngine {
     
     if (hasConfidentialData && isExternalRecipient) {
       result.matched = true;
-      result.action = rules.actions?.includes("block") ? "block" : "warn";
+      
+      // Use enforcement mode to determine action
+      const enforcementMode = rules.enforcementMode || "warn";
+      switch (enforcementMode) {
+        case "silent":
+          result.action = "allow"; // Allow but log
+          break;
+        case "warn":
+          result.action = "warn";
+          break;
+        case "justify":
+          result.action = "warn"; // Special warn that requires justification
+          break;
+        case "block":
+          result.action = "block";
+          break;
+        default:
+          result.action = "warn";
+      }
+      
       result.reason = "Confidential data being sent to external recipient";
       result.metadata = {
         confidentialDataDetected: true,
         externalRecipient: true,
         sensitivity: rules.sensitivity || "medium",
+        enforcementMode: enforcementMode,
+        policyDescription: policy.description,
+        justificationRules: enforcementMode === "justify" ? rules.justificationRules : undefined,
       };
     }
     
