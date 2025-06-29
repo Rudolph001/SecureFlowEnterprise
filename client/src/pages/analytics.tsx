@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import jsPDF from 'jspdf';
 
 export default function Analytics() {
   const { toast } = useToast();
@@ -125,31 +126,155 @@ Protected health information handling meets HIPAA standards.`
     return reportData[reportType as keyof typeof reportData];
   };
 
-  const downloadTextAsFile = (content: string, filename: string) => {
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+  const generateProfessionalPDF = (reportType: string, reportInfo: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 20;
+    const contentWidth = pageWidth - 2 * margin;
+    
+    // Helper function to add text with word wrapping
+    const addWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize: number = 10) => {
+      doc.setFontSize(fontSize);
+      const lines = doc.splitTextToSize(text, maxWidth);
+      doc.text(lines, x, y);
+      return y + (lines.length * fontSize * 0.4);
+    };
+
+    // Company Header
+    doc.setFillColor(31, 41, 55); // Dark blue
+    doc.rect(0, 0, pageWidth, 50, 'F');
+    
+    // Company name
+    doc.setFontSize(24);
+    doc.setTextColor(255, 255, 255);
+    doc.text('SecureFlow Enterprise', margin, 25);
+    
+    // Subtitle
+    doc.setFontSize(12);
+    doc.text('Email Security Platform', margin, 35);
+    
+    // Report type and date
+    doc.setFontSize(10);
+    const dateStr = new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    doc.text(`Generated: ${dateStr}`, pageWidth - margin - 60, 35);
+    
+    // Reset text color for body
+    doc.setTextColor(0, 0, 0);
+    
+    let yPos = 70;
+    
+    // Report Title
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    yPos = addWrappedText(reportInfo.title, margin, yPos, contentWidth, 20);
+    yPos += 10;
+    
+    // Compliance Score Box
+    doc.setFillColor(34, 197, 94); // Green
+    doc.rect(margin, yPos, 80, 25, 'F');
+    doc.setFontSize(16);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Compliance Score', margin + 5, yPos + 10);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text(reportInfo.score, margin + 5, yPos + 20);
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'normal');
+    yPos += 40;
+    
+    // Parse and format content sections
+    const sections = reportInfo.content.split('\n\n');
+    
+    sections.forEach((section: string) => {
+      if (section.trim()) {
+        const lines = section.split('\n');
+        const title = lines[0];
+        
+        // Check if we need a new page
+        if (yPos > pageHeight - 50) {
+          doc.addPage();
+          yPos = margin;
+        }
+        
+        // Section title
+        if (title.includes('SUMMARY') || title.includes('METRICS') || title.includes('STATUS') || 
+            title.includes('CRITERIA') || title.includes('EFFECTIVENESS') || title.includes('FINDINGS') ||
+            title.includes('SAFEGUARDS') || title.includes('AREAS') || title.includes('ASSESSMENT') ||
+            title.includes('RECOMMENDATIONS')) {
+          doc.setFontSize(14);
+          doc.setFont('helvetica', 'bold');
+          doc.setFillColor(59, 130, 246); // Blue
+          doc.rect(margin, yPos - 5, contentWidth, 15, 'F');
+          doc.setTextColor(255, 255, 255);
+          doc.text(title, margin + 5, yPos + 5);
+          doc.setTextColor(0, 0, 0);
+          doc.setFont('helvetica', 'normal');
+          yPos += 20;
+        } else {
+          // Regular content
+          lines.forEach((line: string, index: number) => {
+            if (line.trim()) {
+              doc.setFontSize(10);
+              
+              // Handle bullet points and checkmarks
+              if (line.includes('•') || line.includes('✓') || line.includes('⚠')) {
+                doc.setFont('helvetica', 'normal');
+                yPos = addWrappedText(line, margin + 5, yPos, contentWidth - 10, 10);
+              } else if (line.includes(':') && !line.includes('Generated on')) {
+                // Key-value pairs
+                doc.setFont('helvetica', 'bold');
+                const [key, ...valueParts] = line.split(':');
+                doc.text(key + ':', margin, yPos);
+                doc.setFont('helvetica', 'normal');
+                if (valueParts.length > 0) {
+                  yPos = addWrappedText(valueParts.join(':'), margin + 60, yPos, contentWidth - 60, 10);
+                } else {
+                  yPos += 6;
+                }
+              } else {
+                doc.setFont('helvetica', 'normal');
+                yPos = addWrappedText(line, margin, yPos, contentWidth, 10);
+              }
+              yPos += 2;
+            }
+          });
+        }
+        yPos += 5;
+      }
+    });
+    
+    // Footer
+    const footerY = pageHeight - 20;
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text('SecureFlow Enterprise - Confidential Report', margin, footerY);
+    doc.text(`Page 1 of ${doc.internal.getNumberOfPages()}`, pageWidth - margin - 30, footerY);
+    
+    return doc;
   };
 
   const handleComplianceReport = (reportType: string) => {
     const reportInfo = generateReportContent(reportType);
     
     if (reportInfo) {
-      const filename = `${reportType.replace(' ', '_')}_Compliance_Report_${new Date().toISOString().split('T')[0]}.txt`;
+      const filename = `${reportType.replace(' ', '_')}_Compliance_Report_${new Date().toISOString().split('T')[0]}.pdf`;
       
-      // Download the actual report file
-      downloadTextAsFile(reportInfo.content, filename);
+      // Generate professional PDF
+      const pdf = generateProfessionalPDF(reportType, reportInfo);
+      
+      // Download the PDF
+      pdf.save(filename);
       
       // Show success notification
       toast({
         title: `${reportType} Report Downloaded`,
-        description: `${reportInfo.title} (Score: ${reportInfo.score}) has been generated and downloaded successfully.`,
+        description: `Professional ${reportInfo.title} (Score: ${reportInfo.score}) has been generated and downloaded as PDF.`,
       });
     }
   };
