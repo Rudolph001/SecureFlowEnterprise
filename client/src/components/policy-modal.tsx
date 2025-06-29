@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -31,6 +33,10 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
       keywords: [] as string[],
     },
   });
+
+  const [newCondition, setNewCondition] = useState("");
+  const [newAction, setNewAction] = useState("");
+  const [newKeyword, setNewKeyword] = useState("");
 
   // Effect to populate form when editing
   useEffect(() => {
@@ -96,6 +102,78 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
         keywords: [],
       },
     });
+    setNewCondition("");
+    setNewAction("");
+    setNewKeyword("");
+  };
+
+  const addCondition = () => {
+    if (newCondition.trim() && !formData.rules.conditions.includes(newCondition.trim())) {
+      setFormData({
+        ...formData,
+        rules: {
+          ...formData.rules,
+          conditions: [...formData.rules.conditions, newCondition.trim()]
+        }
+      });
+      setNewCondition("");
+    }
+  };
+
+  const removeCondition = (condition: string) => {
+    setFormData({
+      ...formData,
+      rules: {
+        ...formData.rules,
+        conditions: formData.rules.conditions.filter(c => c !== condition)
+      }
+    });
+  };
+
+  const addAction = () => {
+    if (newAction.trim() && !formData.rules.actions.includes(newAction.trim())) {
+      setFormData({
+        ...formData,
+        rules: {
+          ...formData.rules,
+          actions: [...formData.rules.actions, newAction.trim()]
+        }
+      });
+      setNewAction("");
+    }
+  };
+
+  const removeAction = (action: string) => {
+    setFormData({
+      ...formData,
+      rules: {
+        ...formData.rules,
+        actions: formData.rules.actions.filter(a => a !== action)
+      }
+    });
+  };
+
+  const addKeyword = () => {
+    if (newKeyword.trim() && !formData.rules.keywords.includes(newKeyword.trim())) {
+      setFormData({
+        ...formData,
+        rules: {
+          ...formData.rules,
+          keywords: [...formData.rules.keywords, newKeyword.trim()]
+        }
+      });
+      setNewKeyword("");
+    }
+  };
+
+  const removeKeyword = (keyword: string) => {
+    setFormData({
+      ...formData,
+      rules: {
+        ...formData.rules,
+        keywords: formData.rules.keywords.filter(k => k !== keyword)
+      }
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -110,16 +188,19 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
       return;
     }
 
-    // Build rules based on policy type
-    const rules = {
-      conditions: formData.type === "dlp" ? ["contains_pii", "external_recipient"] :
+    // Use the custom rules from the form, or fall back to defaults for new policies
+    const rules = editPolicy ? formData.rules : {
+      conditions: formData.rules.conditions.length > 0 ? formData.rules.conditions :
+                 formData.type === "dlp" ? ["contains_pii", "external_recipient"] :
                  formData.type === "phishing" ? ["suspicious_sender", "malicious_link"] :
                  formData.type === "executive_protection" ? ["executive_target", "suspicious_sender"] :
                  ["behavioral_anomaly"],
-      actions: formData.type === "dlp" ? ["block", "alert_admin"] :
+      actions: formData.rules.actions.length > 0 ? formData.rules.actions :
+              formData.type === "dlp" ? ["block", "alert_admin"] :
               formData.type === "phishing" ? ["quarantine", "alert_security_team"] :
               ["warn", "log_event"],
-      keywords: formData.type === "dlp" ? ["confidential", "ssn", "credit_card"] : [],
+      keywords: formData.rules.keywords.length > 0 ? formData.rules.keywords :
+               formData.type === "dlp" ? ["confidential", "ssn", "credit_card"] : [],
     };
 
     const targetUsers = formData.targetUsers === "all" ? { groups: ["all"] } :
@@ -150,79 +231,180 @@ export default function PolicyModal({ children, editPolicy, onPolicyCreated, onC
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <Label htmlFor="name">Policy Name *</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Enter policy name"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="type">Policy Type *</Label>
-            <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select policy type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="dlp">Data Loss Prevention</SelectItem>
-                <SelectItem value="phishing">Phishing Protection</SelectItem>
-                <SelectItem value="executive_protection">Executive Protection</SelectItem>
-                <SelectItem value="behavioral">Behavioral Analysis</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Describe what this policy does..."
-              className="h-24"
-            />
-          </div>
-
-          <div>
-            <Label>Target Users</Label>
-            <RadioGroup 
-              value={formData.targetUsers} 
-              onValueChange={(value) => setFormData({ ...formData, targetUsers: value })}
-              className="mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="all" id="all" />
-                <Label htmlFor="all">All Users</Label>
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="rules">Rules & Conditions</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="basic" className="space-y-4">
+              <div>
+                <Label htmlFor="name">Policy Name *</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Enter policy name"
+                  required
+                />
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="groups" id="groups" />
-                <Label htmlFor="groups">Specific Groups</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="executive" id="executive" />
-                <Label htmlFor="executive">Executive Team Only</Label>
-              </div>
-            </RadioGroup>
-          </div>
 
-          <div>
-            <Label htmlFor="severity">Severity Level</Label>
-            <Select value={formData.severity} onValueChange={(value) => setFormData({ ...formData, severity: value })}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="critical">Critical</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              <div>
+                <Label htmlFor="type">Policy Type *</Label>
+                <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select policy type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dlp">Data Loss Prevention</SelectItem>
+                    <SelectItem value="phishing">Phishing Protection</SelectItem>
+                    <SelectItem value="executive_protection">Executive Protection</SelectItem>
+                    <SelectItem value="behavioral">Behavioral Analysis</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Describe what this policy does..."
+                  className="h-24"
+                />
+              </div>
+
+              <div>
+                <Label>Target Users</Label>
+                <RadioGroup 
+                  value={formData.targetUsers} 
+                  onValueChange={(value) => setFormData({ ...formData, targetUsers: value })}
+                  className="mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="all" id="all" />
+                    <Label htmlFor="all">All Users</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="groups" id="groups" />
+                    <Label htmlFor="groups">Specific Groups</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="executive" id="executive" />
+                    <Label htmlFor="executive">Executive Team Only</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div>
+                <Label htmlFor="severity">Severity Level</Label>
+                <Select value={formData.severity} onValueChange={(value) => setFormData({ ...formData, severity: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="critical">Critical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="rules" className="space-y-4">
+              {/* Conditions Section */}
+              <div className="space-y-3">
+                <Label className="text-base font-semibold">Conditions</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newCondition}
+                    onChange={(e) => setNewCondition(e.target.value)}
+                    placeholder="Add new condition (e.g., contains_pii, external_recipient)"
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCondition())}
+                  />
+                  <Button type="button" onClick={addCondition} size="sm">
+                    <i className="fas fa-plus"></i>
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.rules.conditions.map((condition, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                      {condition}
+                      <button
+                        type="button"
+                        onClick={() => removeCondition(condition)}
+                        className="ml-1 text-xs hover:text-red-600"
+                      >
+                        ×
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions Section */}
+              <div className="space-y-3">
+                <Label className="text-base font-semibold">Actions</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newAction}
+                    onChange={(e) => setNewAction(e.target.value)}
+                    placeholder="Add new action (e.g., block, alert_admin, quarantine)"
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAction())}
+                  />
+                  <Button type="button" onClick={addAction} size="sm">
+                    <i className="fas fa-plus"></i>
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.rules.actions.map((action, index) => (
+                    <Badge key={index} variant="destructive" className="flex items-center gap-1">
+                      {action}
+                      <button
+                        type="button"
+                        onClick={() => removeAction(action)}
+                        className="ml-1 text-xs hover:text-red-200"
+                      >
+                        ×
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Keywords Section */}
+              <div className="space-y-3">
+                <Label className="text-base font-semibold">Keywords</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newKeyword}
+                    onChange={(e) => setNewKeyword(e.target.value)}
+                    placeholder="Add keyword (e.g., confidential, ssn, credit_card)"
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addKeyword())}
+                  />
+                  <Button type="button" onClick={addKeyword} size="sm">
+                    <i className="fas fa-plus"></i>
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.rules.keywords.map((keyword, index) => (
+                    <Badge key={index} variant="outline" className="flex items-center gap-1">
+                      {keyword}
+                      <button
+                        type="button"
+                        onClick={() => removeKeyword(keyword)}
+                        className="ml-1 text-xs hover:text-red-600"
+                      >
+                        ×
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
 
           <div className="flex justify-end space-x-3 pt-4 border-t">
             <Button 
