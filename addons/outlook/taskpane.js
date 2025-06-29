@@ -5,8 +5,8 @@
 
     // Configuration
     const CONFIG = {
-        apiEndpoint: process.env.TESSIAN_API_URL || 'https://api.tessian.com',
-        apiKey: process.env.TESSIAN_API_KEY || 'your-api-key-here',
+        apiEndpoint: 'https://your-repl-name-username.replit.app',
+        apiKey: 'your-api-key-here',
         silentMode: false,
         blockHighRisk: true,
         externalWarnings: true,

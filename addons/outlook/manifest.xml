@@ -18,8 +18,8 @@
   <SupportUrl DefaultValue="https://support.tessian.com"/>
   
   <AppDomains>
-    <AppDomain>https://tessian-addon.azurewebsites.net</AppDomain>
-    <AppDomain>https://api.tessian.com</AppDomain>
+    <AppDomain>https://your-repl-name-username.replit.app</AppDomain>
+    <AppDomain>https://your-repl-name-username.replit.app</AppDomain>
   </AppDomains>
   
   <Hosts>
@@ -35,7 +35,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://tessian-addon.azurewebsites.net/warning-pane.html"/>
+        <SourceLocation DefaultValue="https://your-repl-name-username.replit.app/addons/outlook/warning-pane.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -112,14 +112,14 @@
       
       <Resources>
         <bt:Images>
-          <bt:Image id="Icon.16x16" DefaultValue="https://tessian-addon.azurewebsites.net/images/icon-16.png"/>
-          <bt:Image id="Icon.32x32" DefaultValue="https://tessian-addon.azurewebsites.net/images/icon-32.png"/>
-          <bt:Image id="Icon.80x80" DefaultValue="https://tessian-addon.azurewebsites.net/images/icon-80.png"/>
+          <bt:Image id="Icon.16x16" DefaultValue="https://your-repl-name-username.replit.app/images/icon-16.png"/>
+          <bt:Image id="Icon.32x32" DefaultValue="https://your-repl-name-username.replit.app/images/icon-32.png"/>
+          <bt:Image id="Icon.80x80" DefaultValue="https://your-repl-name-username.replit.app/images/icon-80.png"/>
         </bt:Images>
         <bt:Urls>
-          <bt:Url id="Taskpane.Url" DefaultValue="https://tessian-addon.azurewebsites.net/warning-pane.html"/>
-          <bt:Url id="JSRuntime.Url" DefaultValue="https://tessian-addon.azurewebsites.net/taskpane.js"/>
-          <bt:Url id="WebViewRuntime.Url" DefaultValue="https://tessian-addon.azurewebsites.net/warning-pane.html"/>
+          <bt:Url id="Taskpane.Url" DefaultValue="https://your-repl-name-username.replit.app/addons/outlook/warning-pane.html"/>
+          <bt:Url id="JSRuntime.Url" DefaultValue="https://your-repl-name-username.replit.app/addons/outlook/taskpane.js"/>
+          <bt:Url id="WebViewRuntime.Url" DefaultValue="https://your-repl-name-username.replit.app/addons/outlook/warning-pane.html"/>
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GroupLabel" DefaultValue="Tessian Security"/>
