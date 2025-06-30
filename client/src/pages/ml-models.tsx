@@ -131,6 +131,33 @@ export default function MlModels() {
     });
   };
 
+  const handleViewMetrics = (model: any) => {
+    toast({
+      title: "Model Metrics",
+      description: `Viewing detailed metrics for ${model.name}`,
+    });
+    // In a real app, this would open a detailed metrics modal or navigate to a metrics page
+    console.log('Viewing metrics for model:', model);
+  };
+
+  const handleConfigure = (model: any) => {
+    toast({
+      title: "Model Configuration",
+      description: `Opening configuration for ${model.name}`,
+    });
+    // In a real app, this would open a configuration modal or navigate to a config page
+    console.log('Configuring model:', model);
+  };
+
+  const handleExportModel = (model: any) => {
+    toast({
+      title: "Exporting Model",
+      description: `Preparing export for ${model.name}`,
+    });
+    // In a real app, this would trigger a model export download
+    console.log('Exporting model:', model);
+  };
+
   return (
     <>
       <Header
@@ -243,17 +270,29 @@ export default function MlModels() {
                             <i className="fas fa-play mr-1"></i>
                             {model.status === 'training' ? 'Training...' : 'Retrain'}
                           </Button>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleExportModel(model)}
+                          >
                             <i className="fas fa-download mr-1"></i>
                             Export
                           </Button>
                         </div>
                         <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleViewMetrics(model)}
+                          >
                             <i className="fas fa-chart-line mr-1"></i>
                             Metrics
                           </Button>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleConfigure(model)}
+                          >
                             <i className="fas fa-cog mr-1"></i>
                             Configure
                           </Button>
