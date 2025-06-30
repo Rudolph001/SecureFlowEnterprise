@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import Header from "@/components/header";
 import MetricsCard from "@/components/metrics-card";
+import ModelMetricsModal from "@/components/model-metrics-modal";
+import ModelConfigModal from "@/components/model-config-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +17,9 @@ import { apiRequest } from "@/lib/queryClient";
 export default function MlModels() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [metricsModalOpen, setMetricsModalOpen] = useState(false);
+  const [configModalOpen, setConfigModalOpen] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<any>(null);
 
   const { data: mlModels, isLoading } = useQuery({
     queryKey: ['/api/ml-models'],
@@ -132,21 +138,24 @@ export default function MlModels() {
   };
 
   const handleViewMetrics = (model: any) => {
-    toast({
-      title: "Model Metrics",
-      description: `Viewing detailed metrics for ${model.name}`,
-    });
-    // In a real app, this would open a detailed metrics modal or navigate to a metrics page
-    console.log('Viewing metrics for model:', model);
+    setSelectedModel(model);
+    setMetricsModalOpen(true);
   };
 
   const handleConfigure = (model: any) => {
-    toast({
-      title: "Model Configuration",
-      description: `Opening configuration for ${model.name}`,
+    setSelectedModel(model);
+    setConfigModalOpen(true);
+  };
+
+  const handleSaveConfig = (config: any) => {
+    updateModelMutation.mutate({
+      id: selectedModel.id,
+      updates: { configuration: config }
     });
-    // In a real app, this would open a configuration modal or navigate to a config page
-    console.log('Configuring model:', model);
+    toast({
+      title: "Configuration Saved",
+      description: `Configuration updated for ${selectedModel.name}`,
+    });
   };
 
   const handleExportModel = (model: any) => {
@@ -508,6 +517,20 @@ export default function MlModels() {
           </Card>
         </div>
       </main>
+
+      {/* Modals */}
+      <ModelMetricsModal
+        open={metricsModalOpen}
+        onOpenChange={setMetricsModalOpen}
+        model={selectedModel}
+      />
+      
+      <ModelConfigModal
+        open={configModalOpen}
+        onOpenChange={setConfigModalOpen}
+        model={selectedModel}
+        onSave={handleSaveConfig}
+      />
     </>
   );
 }
