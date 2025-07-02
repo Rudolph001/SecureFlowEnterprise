@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import Header from "@/components/header";
 import MetricsCard from "@/components/metrics-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,8 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 
 export default function Guardian() {
+  const [selectedEmail, setSelectedEmail] = useState<any>(null);
+  const [isInvestigationOpen, setIsInvestigationOpen] = useState(false);
+  
   const { data: emailEvents } = useQuery({
     queryKey: ['/api/email-events'],
   });
@@ -103,22 +110,8 @@ export default function Guardian() {
   };
 
   const handleInvestigate = (email: any) => {
-    // Create investigation modal or redirect to detailed view
-    alert(`Investigating Email ID: ${email.id}
-    
-Subject: ${email.subject}
-From: ${email.sender}
-To: ${email.recipient}
-Risk Score: ${(email.riskScore * 100).toFixed(0)}%
-Status: ${email.status.toUpperCase()}
-Reason: ${email.reason}
-
-This would open a detailed investigation panel with:
-- Full email content analysis
-- Recipient verification
-- Content classification results
-- Suggested actions
-- Investigation timeline`);
+    setSelectedEmail(email);
+    setIsInvestigationOpen(true);
   };
 
   return (
@@ -339,6 +332,250 @@ This would open a detailed investigation panel with:
           </Card>
         </div>
       </main>
+
+      {/* Professional Investigation Modal */}
+      <Dialog open={isInvestigationOpen} onOpenChange={setIsInvestigationOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <i className="fas fa-search text-white"></i>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold">Email Security Investigation</h3>
+                <p className="text-sm text-slate-600">Detailed analysis and threat assessment</p>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedEmail && (
+            <div className="space-y-6">
+              {/* Header Summary */}
+              <div className="bg-slate-50 rounded-lg p-4 border-l-4 border-blue-500">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold text-slate-900 mb-2">Email Details</h4>
+                    <div className="space-y-2 text-sm">
+                      <div><span className="font-medium">Subject:</span> {selectedEmail.subject}</div>
+                      <div><span className="font-medium">From:</span> {selectedEmail.sender}</div>
+                      <div><span className="font-medium">To:</span> {selectedEmail.recipient}</div>
+                      <div><span className="font-medium">Timestamp:</span> {formatTimeAgo(selectedEmail.timestamp)}</div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-900 mb-2">Risk Assessment</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-3">
+                        <Badge variant={getStatusBadge(selectedEmail.status) as any}>
+                          {selectedEmail.status.toUpperCase()}
+                        </Badge>
+                        <span className={`text-sm font-bold ${getRiskColor(selectedEmail.riskScore)}`}>
+                          {(selectedEmail.riskScore * 100).toFixed(0)}% Risk Score
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-600">{selectedEmail.reason}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Detailed Investigation Tabs */}
+              <Tabs defaultValue="analysis" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="analysis">Analysis</TabsTrigger>
+                  <TabsTrigger value="content">Content</TabsTrigger>
+                  <TabsTrigger value="recipients">Recipients</TabsTrigger>
+                  <TabsTrigger value="actions">Actions</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="analysis" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Threat Analysis</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h5 className="font-semibold mb-3">Detection Triggers</h5>
+                          <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                              <i className="fas fa-exclamation-triangle text-red-500"></i>
+                              <span className="text-sm">External competitor recipient</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <i className="fas fa-file-alt text-amber-500"></i>
+                              <span className="text-sm">Contains confidential keywords</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <i className="fas fa-shield-alt text-red-500"></i>
+                              <span className="text-sm">Policy violation detected</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="font-semibold mb-3">Risk Factors</h5>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm">Recipient trust level</span>
+                              <div className="w-24 bg-red-200 rounded-full h-2">
+                                <div className="bg-red-500 h-2 rounded-full" style={{width: '15%'}}></div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm">Content sensitivity</span>
+                              <div className="w-24 bg-red-200 rounded-full h-2">
+                                <div className="bg-red-500 h-2 rounded-full" style={{width: '95%'}}></div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm">Historical patterns</span>
+                              <div className="w-24 bg-amber-200 rounded-full h-2">
+                                <div className="bg-amber-500 h-2 rounded-full" style={{width: '70%'}}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="content" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Content Classification</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="font-semibold mb-2">Detected Data Types</h5>
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="destructive">Financial Data</Badge>
+                            <Badge variant="destructive">Confidential Reports</Badge>
+                            <Badge variant="secondary">Business Strategy</Badge>
+                            <Badge variant="secondary">Revenue Information</Badge>
+                          </div>
+                        </div>
+                        <Separator />
+                        <div>
+                          <h5 className="font-semibold mb-2">Email Preview</h5>
+                          <div className="bg-slate-100 rounded-lg p-4 border">
+                            <div className="text-sm space-y-2">
+                              <div><strong>Subject:</strong> {selectedEmail.subject}</div>
+                              <div><strong>Content Preview:</strong></div>
+                              <div className="bg-white p-3 rounded border italic text-slate-700">
+                                "Please find attached our Q4 financial performance report including revenue projections, 
+                                profit margins, and strategic initiatives for the upcoming year. This document contains 
+                                highly sensitive information regarding our competitive position..."
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="recipients" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Recipient Analysis</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h5 className="font-semibold mb-2">Primary Recipient</h5>
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <i className="fas fa-building text-red-500"></i>
+                                <span className="font-medium">{selectedEmail.recipient}</span>
+                              </div>
+                              <div className="text-sm space-y-1">
+                                <div><strong>Organization:</strong> Rival Corp</div>
+                                <div><strong>Relationship:</strong> External Competitor</div>
+                                <div><strong>Trust Level:</strong> <span className="text-red-600 font-medium">Untrusted</span></div>
+                                <div><strong>Previous Interactions:</strong> 0 emails</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <h5 className="font-semibold mb-2">Verification Status</h5>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <i className="fas fa-times-circle text-red-500"></i>
+                                <span className="text-sm">Domain not in allow list</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <i className="fas fa-times-circle text-red-500"></i>
+                                <span className="text-sm">Recipient not verified</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <i className="fas fa-times-circle text-red-500"></i>
+                                <span className="text-sm">Flagged as competitor</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="actions" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Recommended Actions</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Button variant="destructive" className="h-16 flex-col">
+                            <i className="fas fa-ban mb-1"></i>
+                            Block & Quarantine
+                          </Button>
+                          <Button variant="outline" className="h-16 flex-col">
+                            <i className="fas fa-user-graduate mb-1"></i>
+                            User Training
+                          </Button>
+                          <Button variant="outline" className="h-16 flex-col">
+                            <i className="fas fa-bell mb-1"></i>
+                            Create Alert
+                          </Button>
+                          <Button variant="outline" className="h-16 flex-col">
+                            <i className="fas fa-file-export mb-1"></i>
+                            Export Report
+                          </Button>
+                        </div>
+                        
+                        <Separator />
+                        
+                        <div>
+                          <h5 className="font-semibold mb-2">Investigation Notes</h5>
+                          <textarea 
+                            className="w-full h-24 p-3 border rounded-lg resize-none"
+                            placeholder="Add investigation notes, decision rationale, or follow-up actions..."
+                          />
+                        </div>
+                        
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="outline" onClick={() => setIsInvestigationOpen(false)}>
+                            Close Investigation
+                          </Button>
+                          <Button>
+                            <i className="fas fa-save mr-2"></i>
+                            Save Investigation
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
