@@ -105,6 +105,8 @@ This is a comprehensive enterprise email security platform providing advanced em
 ## Changelog
 
 Changelog:
+- July 2, 2025. Added click handlers to all action buttons in investigation modal (Block & Quarantine, User Training, Create Alert, Export Report, Save Investigation)
+- July 2, 2025. Created professional investigation modal with tabbed interface replacing simple alert
 - July 2, 2025. Fixed missing "Investigate" button functionality in Guardian module misdirected email detection
 - July 2, 2025. Created Outlook COM add-in for local testing with manifest, taskpane, and commands
 - July 2, 2025. Completed migration from Replit Agent to standard Replit environment

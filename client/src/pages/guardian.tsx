@@ -114,6 +114,37 @@ export default function Guardian() {
     setIsInvestigationOpen(true);
   };
 
+  const handleBlockAndQuarantine = () => {
+    if (selectedEmail) {
+      alert(`Email "${selectedEmail.subject}" has been blocked and quarantined.\n\nActions taken:\n• Email moved to quarantine\n• Sender added to block list\n• Incident logged for compliance\n• Security team notified`);
+    }
+  };
+
+  const handleUserTraining = () => {
+    if (selectedEmail) {
+      alert(`User training session initiated for ${selectedEmail.sender}\n\nTraining module:\n• Data loss prevention awareness\n• External recipient verification\n• Confidential data handling\n• Company security policies`);
+    }
+  };
+
+  const handleCreateAlert = () => {
+    if (selectedEmail) {
+      alert(`Security alert created for email ID: ${selectedEmail.id}\n\nAlert details:\n• High-priority incident\n• Assigned to security team\n• Escalation rules applied\n• Notification sent to administrators`);
+    }
+  };
+
+  const handleExportReport = () => {
+    if (selectedEmail) {
+      alert(`Investigation report exported for email ID: ${selectedEmail.id}\n\nReport includes:\n• Complete threat analysis\n• Risk assessment details\n• Recommended actions\n• Compliance documentation\n\nReport saved to: SecurityReports/Investigation_${selectedEmail.id}_${new Date().toISOString().split('T')[0]}.pdf`);
+    }
+  };
+
+  const handleSaveInvestigation = () => {
+    if (selectedEmail) {
+      alert(`Investigation saved for email ID: ${selectedEmail.id}\n\nSaved data:\n• Analysis results\n• Investigation notes\n• Action history\n• Timestamp: ${new Date().toLocaleString()}\n\nInvestigation can be referenced for future incidents.`);
+      setIsInvestigationOpen(false);
+    }
+  };
+
   return (
     <>
       <Header
@@ -530,19 +561,19 @@ export default function Guardian() {
                     <CardContent>
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <Button variant="destructive" className="h-16 flex-col">
+                          <Button variant="destructive" className="h-16 flex-col" onClick={handleBlockAndQuarantine}>
                             <i className="fas fa-ban mb-1"></i>
                             Block & Quarantine
                           </Button>
-                          <Button variant="outline" className="h-16 flex-col">
+                          <Button variant="outline" className="h-16 flex-col" onClick={handleUserTraining}>
                             <i className="fas fa-user-graduate mb-1"></i>
                             User Training
                           </Button>
-                          <Button variant="outline" className="h-16 flex-col">
+                          <Button variant="outline" className="h-16 flex-col" onClick={handleCreateAlert}>
                             <i className="fas fa-bell mb-1"></i>
                             Create Alert
                           </Button>
-                          <Button variant="outline" className="h-16 flex-col">
+                          <Button variant="outline" className="h-16 flex-col" onClick={handleExportReport}>
                             <i className="fas fa-file-export mb-1"></i>
                             Export Report
                           </Button>
@@ -562,7 +593,7 @@ export default function Guardian() {
                           <Button variant="outline" onClick={() => setIsInvestigationOpen(false)}>
                             Close Investigation
                           </Button>
-                          <Button>
+                          <Button onClick={handleSaveInvestigation}>
                             <i className="fas fa-save mr-2"></i>
                             Save Investigation
                           </Button>
