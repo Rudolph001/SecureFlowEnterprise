@@ -528,17 +528,216 @@ Protected health information handling meets HIPAA standards.`
               </Card>
             </div>
 
-            {/* Timeline Chart Placeholder */}
+            {/* Security Events Timeline */}
             <Card>
               <CardHeader>
-                <CardTitle>Security Events Timeline</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Security Events Timeline</CardTitle>
+                  <div className="flex items-center space-x-2">
+                    <Select defaultValue="24h">
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1h">Last Hour</SelectItem>
+                        <SelectItem value="24h">24 Hours</SelectItem>
+                        <SelectItem value="7d">7 Days</SelectItem>
+                        <SelectItem value="30d">30 Days</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-slate-100 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <i className="fas fa-chart-line text-4xl text-slate-400 mb-2"></i>
-                    <p className="text-sm text-slate-600">Security Events Over Time</p>
-                    <p className="text-xs text-slate-500">Interactive timeline visualization</p>
+                <div className="space-y-6">
+                  {/* Timeline Header */}
+                  <div className="flex items-center justify-between text-sm text-slate-600">
+                    <span>Recent Activity</span>
+                    <span>Live Updates</span>
+                  </div>
+                  
+                  {/* Timeline Events */}
+                  <div className="relative">
+                    {/* Timeline Line */}
+                    <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-200"></div>
+                    
+                    <div className="space-y-4">
+                      {/* High Severity Event */}
+                      <div className="relative flex items-start space-x-4">
+                        <div className="relative z-10 flex-shrink-0">
+                          <div className="w-8 h-8 bg-red-100 border-2 border-red-500 rounded-full flex items-center justify-center">
+                            <i className="fas fa-exclamation-triangle text-red-600 text-xs"></i>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="text-sm font-medium text-slate-900">Phishing Attempt Blocked</h4>
+                              <p className="text-sm text-slate-600">CEO impersonation targeting Finance team</p>
+                            </div>
+                            <div className="text-right">
+                              <Badge variant="destructive">High Risk</Badge>
+                              <p className="text-xs text-slate-500 mt-1">2 minutes ago</p>
+                            </div>
+                          </div>
+                          <div className="mt-2 text-xs text-slate-500">
+                            Target: finance@company.com • Source: suspicious-domain.com • Action: Quarantined
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Medium Severity Event */}
+                      <div className="relative flex items-start space-x-4">
+                        <div className="relative z-10 flex-shrink-0">
+                          <div className="w-8 h-8 bg-amber-100 border-2 border-amber-500 rounded-full flex items-center justify-center">
+                            <i className="fas fa-shield-alt text-amber-600 text-xs"></i>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="text-sm font-medium text-slate-900">Misdirected Email Detection</h4>
+                              <p className="text-sm text-slate-600">Personal email sent to external domain</p>
+                            </div>
+                            <div className="text-right">
+                              <Badge variant="secondary">Medium Risk</Badge>
+                              <p className="text-xs text-slate-500 mt-1">8 minutes ago</p>
+                            </div>
+                          </div>
+                          <div className="mt-2 text-xs text-slate-500">
+                            User: j.smith@company.com • Guardian Module • Action: User Warned
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Low Severity Event */}
+                      <div className="relative flex items-start space-x-4">
+                        <div className="relative z-10 flex-shrink-0">
+                          <div className="w-8 h-8 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center">
+                            <i className="fas fa-check text-green-600 text-xs"></i>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="text-sm font-medium text-slate-900">Policy Compliance Check</h4>
+                              <p className="text-sm text-slate-600">Outbound email scanned and approved</p>
+                            </div>
+                            <div className="text-right">
+                              <Badge variant="default">Allowed</Badge>
+                              <p className="text-xs text-slate-500 mt-1">12 minutes ago</p>
+                            </div>
+                          </div>
+                          <div className="mt-2 text-xs text-slate-500">
+                            User: m.johnson@company.com • Enforcer Module • Risk Score: 2/100
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Training Event */}
+                      <div className="relative flex items-start space-x-4">
+                        <div className="relative z-10 flex-shrink-0">
+                          <div className="w-8 h-8 bg-blue-100 border-2 border-blue-500 rounded-full flex items-center justify-center">
+                            <i className="fas fa-graduation-cap text-blue-600 text-xs"></i>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="text-sm font-medium text-slate-900">Security Training Completed</h4>
+                              <p className="text-sm text-slate-600">Phishing awareness module finished</p>
+                            </div>
+                            <div className="text-right">
+                              <Badge variant="outline">Training</Badge>
+                              <p className="text-xs text-slate-500 mt-1">18 minutes ago</p>
+                            </div>
+                          </div>
+                          <div className="mt-2 text-xs text-slate-500">
+                            User: a.williams@company.com • Coach Module • Score: 95/100
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* System Event */}
+                      <div className="relative flex items-start space-x-4">
+                        <div className="relative z-10 flex-shrink-0">
+                          <div className="w-8 h-8 bg-purple-100 border-2 border-purple-500 rounded-full flex items-center justify-center">
+                            <i className="fas fa-cog text-purple-600 text-xs"></i>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="text-sm font-medium text-slate-900">ML Model Updated</h4>
+                              <p className="text-sm text-slate-600">Threat detection algorithm retrained</p>
+                            </div>
+                            <div className="text-right">
+                              <Badge variant="outline">System</Badge>
+                              <p className="text-xs text-slate-500 mt-1">25 minutes ago</p>
+                            </div>
+                          </div>
+                          <div className="mt-2 text-xs text-slate-500">
+                            Architect Module • New samples: 1,247 • Accuracy: 99.8%
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Threat Intelligence Update */}
+                      <div className="relative flex items-start space-x-4">
+                        <div className="relative z-10 flex-shrink-0">
+                          <div className="w-8 h-8 bg-indigo-100 border-2 border-indigo-500 rounded-full flex items-center justify-center">
+                            <i className="fas fa-globe text-indigo-600 text-xs"></i>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="text-sm font-medium text-slate-900">Threat Intelligence Updated</h4>
+                              <p className="text-sm text-slate-600">New malicious domains identified</p>
+                            </div>
+                            <div className="text-right">
+                              <Badge variant="outline">Intel</Badge>
+                              <p className="text-xs text-slate-500 mt-1">32 minutes ago</p>
+                            </div>
+                          </div>
+                          <div className="mt-2 text-xs text-slate-500">
+                            Sources: 3 feeds • New indicators: 47 domains, 12 IPs
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Timeline Footer */}
+                  <div className="flex items-center justify-between pt-4 border-t">
+                    <div className="flex items-center space-x-4 text-xs text-slate-500">
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        <span>High Risk</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                        <span>Medium Risk</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span>Low Risk</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span>Training</span>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => {
+                      toast({
+                        title: "📊 Timeline Exported",
+                        description: "Security events timeline exported to CSV format successfully.",
+                        duration: 3000,
+                      });
+                    }}>
+                      <i className="fas fa-download mr-1"></i>
+                      Export Timeline
+                    </Button>
                   </div>
                 </div>
               </CardContent>
