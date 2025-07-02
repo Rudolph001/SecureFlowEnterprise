@@ -11,10 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { Toast } from "@/components/ui/toast";
 
 export default function Guardian() {
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
   const [isInvestigationOpen, setIsInvestigationOpen] = useState(false);
+  const { toast } = useToast();
   
   const { data: emailEvents } = useQuery({
     queryKey: ['/api/email-events'],
@@ -116,31 +119,55 @@ export default function Guardian() {
 
   const handleBlockAndQuarantine = () => {
     if (selectedEmail) {
-      alert(`Email "${selectedEmail.subject}" has been blocked and quarantined.\n\nActions taken:\n• Email moved to quarantine\n• Sender added to block list\n• Incident logged for compliance\n• Security team notified`);
+      toast({
+        title: "✅ Email Blocked & Quarantined",
+        description: `"${selectedEmail.subject}" has been secured. Email moved to quarantine, sender blocked, and security team notified.`,
+        duration: 6000,
+      });
+      setIsInvestigationOpen(false);
     }
   };
 
   const handleUserTraining = () => {
     if (selectedEmail) {
-      alert(`User training session initiated for ${selectedEmail.sender}\n\nTraining module:\n• Data loss prevention awareness\n• External recipient verification\n• Confidential data handling\n• Company security policies`);
+      toast({
+        title: "🎓 User Training Initiated",
+        description: `Training session started for ${selectedEmail.sender}. Module includes DLP awareness, recipient verification, and security policies.`,
+        duration: 5000,
+      });
+      setIsInvestigationOpen(false);
     }
   };
 
   const handleCreateAlert = () => {
     if (selectedEmail) {
-      alert(`Security alert created for email ID: ${selectedEmail.id}\n\nAlert details:\n• High-priority incident\n• Assigned to security team\n• Escalation rules applied\n• Notification sent to administrators`);
+      toast({
+        title: "🚨 Security Alert Created",
+        description: `High-priority incident #${selectedEmail.id} created. Security team assigned with escalation rules applied and administrators notified.`,
+        duration: 5000,
+      });
+      setIsInvestigationOpen(false);
     }
   };
 
   const handleExportReport = () => {
     if (selectedEmail) {
-      alert(`Investigation report exported for email ID: ${selectedEmail.id}\n\nReport includes:\n• Complete threat analysis\n• Risk assessment details\n• Recommended actions\n• Compliance documentation\n\nReport saved to: SecurityReports/Investigation_${selectedEmail.id}_${new Date().toISOString().split('T')[0]}.pdf`);
+      const reportDate = new Date().toISOString().split('T')[0];
+      toast({
+        title: "📄 Investigation Report Exported",
+        description: `Complete analysis report for email #${selectedEmail.id} saved to SecurityReports/Investigation_${selectedEmail.id}_${reportDate}.pdf`,
+        duration: 4000,
+      });
     }
   };
 
   const handleSaveInvestigation = () => {
     if (selectedEmail) {
-      alert(`Investigation saved for email ID: ${selectedEmail.id}\n\nSaved data:\n• Analysis results\n• Investigation notes\n• Action history\n• Timestamp: ${new Date().toLocaleString()}\n\nInvestigation can be referenced for future incidents.`);
+      toast({
+        title: "💾 Investigation Saved",
+        description: `Complete investigation data for email #${selectedEmail.id} saved successfully. Analysis results, notes, and action history archived for future reference.`,
+        duration: 4000,
+      });
       setIsInvestigationOpen(false);
     }
   };
