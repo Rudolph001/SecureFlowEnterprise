@@ -77,13 +77,13 @@ export default function Guardian() {
     },
   ];
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
+  const getStatusBadge = (status: string): "destructive" | "secondary" | "default" => {
+    const variants: Record<string, "destructive" | "secondary" | "default"> = {
       blocked: "destructive",
       warned: "secondary",
       allowed: "default",
     };
-    return variants[status as keyof typeof variants] || "default";
+    return variants[status] || "default";
   };
 
   const getRiskColor = (score: number) => {
@@ -100,6 +100,25 @@ export default function Guardian() {
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins} minutes ago`;
     return `${Math.floor(diffMins / 60)} hours ago`;
+  };
+
+  const handleInvestigate = (email: any) => {
+    // Create investigation modal or redirect to detailed view
+    alert(`Investigating Email ID: ${email.id}
+    
+Subject: ${email.subject}
+From: ${email.sender}
+To: ${email.recipient}
+Risk Score: ${(email.riskScore * 100).toFixed(0)}%
+Status: ${email.status.toUpperCase()}
+Reason: ${email.reason}
+
+This would open a detailed investigation panel with:
+- Full email content analysis
+- Recipient verification
+- Content classification results
+- Suggested actions
+- Investigation timeline`);
   };
 
   return (
@@ -139,7 +158,7 @@ export default function Guardian() {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <Badge variant={getStatusBadge(email.status)}>
+                            <Badge variant={getStatusBadge(email.status) as any}>
                               {email.status.toUpperCase()}
                             </Badge>
                             <span className={`text-sm font-medium ${getRiskColor(email.riskScore)}`}>
@@ -158,7 +177,11 @@ export default function Guardian() {
                         </div>
                         <div className="flex flex-col items-end space-y-2">
                           <span className="text-xs text-slate-500">{formatTimeAgo(email.timestamp)}</span>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleInvestigate(email)}
+                          >
                             Investigate
                           </Button>
                         </div>
