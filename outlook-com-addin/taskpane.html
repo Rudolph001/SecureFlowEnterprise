@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SecureFlow Email Security</title>
+    
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            margin: -16px -16px 16px -16px;
+            border-radius: 0;
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #495057;
+        }
+        
+        .threat-level {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .threat-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .threat-low { background-color: #28a745; }
+        .threat-medium { background-color: #ffc107; }
+        .threat-high { background-color: #dc3545; }
+        
+        .scan-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        
+        .scan-button:hover {
+            opacity: 0.9;
+        }
+        
+        .scan-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .analysis-result {
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+        
+        .analysis-safe {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .analysis-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .analysis-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .metric-value {
+            font-weight: bold;
+            font-size: 16px;
+            color: #495057;
+        }
+        
+        .metric-label {
+            color: #6c757d;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">SecureFlow</div>
+        <div class="subtitle">Email Security Protection</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Current Email Analysis</div>
+        <div class="threat-level">
+            <div class="threat-indicator threat-low" id="threatIndicator"></div>
+            <span id="threatLevel">Analyzing...</span>
+        </div>
+        <button class="scan-button" id="scanButton" onclick="scanCurrentEmail()">
+            Scan Current Email
+        </button>
+        <div id="analysisResult" class="analysis-result" style="display: none;"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Security Metrics</div>
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value" id="threatsBlocked">-</div>
+                <div class="metric-label">Threats Blocked</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="usersProtected">-</div>
+                <div class="metric-label">Users Protected</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        Office.onReady((info) => {
+            if (info.host === Office.HostType.Outlook) {
+                console.log('SecureFlow Outlook Add-in loaded');
+                loadMetrics();
+                analyzeCurrentEmail();
+            }
+        });
+
+        async function loadMetrics() {
+            try {
+                const response = await fetch('/api/dashboard/metrics');
+                const metrics = await response.json();
+                
+                document.getElementById('threatsBlocked').textContent = metrics.threatsBlocked || 0;
+                document.getElementById('usersProtected').textContent = metrics.usersProtected || 0;
+            } catch (error) {
+                console.error('Failed to load metrics:', error);
+            }
+        }
+
+        async function analyzeCurrentEmail() {
+            try {
+                Office.context.mailbox.item.body.getAsync("text", async (result) => {
+                    if (result.status === Office.AsyncResultStatus.Succeeded) {
+                        const emailContent = result.value;
+                        const subject = Office.context.mailbox.item.subject;
+                        const sender = Office.context.mailbox.item.from?.emailAddress || 'unknown';
+                        
+                        // Analyze the email content
+                        const analysis = await analyzeEmail({
+                            subject: subject,
+                            body: emailContent,
+                            sender: sender
+                        });
+                        
+                        updateThreatLevel(analysis);
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to analyze email:', error);
+                updateThreatLevel({ riskScore: 0, threats: [], status: 'error' });
+            }
+        }
+
+        async function scanCurrentEmail() {
+            const button = document.getElementById('scanButton');
+            const result = document.getElementById('analysisResult');
+            
+            button.disabled = true;
+            button.textContent = 'Scanning...';
+            result.style.display = 'none';
+            
+            try {
+                Office.context.mailbox.item.body.getAsync("text", async (bodyResult) => {
+                    if (bodyResult.status === Office.AsyncResultStatus.Succeeded) {
+                        const emailData = {
+                            subject: Office.context.mailbox.item.subject || '',
+                            body: bodyResult.value || '',
+                            sender: Office.context.mailbox.item.from?.emailAddress || 'unknown',
+                            recipients: Office.context.mailbox.item.to?.map(r => r.emailAddress) || [],
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        // Send to SecureFlow API for analysis
+                        const response = await fetch('/api/email-events', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                userId: 1, // Default user for demo
+                                eventType: 'scan_request',
+                                subject: emailData.subject,
+                                sender: emailData.sender,
+                                recipients: emailData.recipients,
+                                riskScore: calculateRiskScore(emailData),
+                                threatTypes: detectThreats(emailData),
+                                action: 'scanned'
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            const analysis = await response.json();
+                            showAnalysisResult(analysis);
+                        } else {
+                            throw new Error('Analysis failed');
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Scan failed:', error);
+                showAnalysisResult({
+                    riskScore: 0,
+                    threats: [],
+                    status: 'error',
+                    message: 'Unable to complete scan. Please try again.'
+                });
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Scan Current Email';
+            }
+        }
+
+        function analyzeEmail(emailData) {
+            // Simple threat detection logic
+            const threats = detectThreats(emailData);
+            const riskScore = calculateRiskScore(emailData);
+            
+            return {
+                riskScore: riskScore,
+                threats: threats,
+                status: 'complete'
+            };
+        }
+
+        function detectThreats(emailData) {
+            const threats = [];
+            const body = emailData.body.toLowerCase();
+            const subject = emailData.subject.toLowerCase();
+            
+            // Check for common phishing indicators
+            if (body.includes('urgent') || body.includes('verify account') || body.includes('click here')) {
+                threats.push('phishing');
+            }
+            
+            // Check for suspicious links
+            if (body.includes('http://') || body.match(/bit\.ly|tinyurl|t\.co/)) {
+                threats.push('suspicious_links');
+            }
+            
+            // Check for financial keywords
+            if (body.includes('bank') || body.includes('payment') || body.includes('credit card')) {
+                threats.push('financial_fraud');
+            }
+            
+            return threats;
+        }
+
+        function calculateRiskScore(emailData) {
+            let score = 0;
+            const body = emailData.body.toLowerCase();
+            const subject = emailData.subject.toLowerCase();
+            
+            // Risk factors
+            if (body.includes('urgent')) score += 30;
+            if (body.includes('verify')) score += 25;
+            if (body.includes('suspended')) score += 40;
+            if (body.includes('click here')) score += 20;
+            if (subject.includes('re:') && !body.includes('previous')) score += 15;
+            
+            return Math.min(score, 100);
+        }
+
+        function updateThreatLevel(analysis) {
+            const indicator = document.getElementById('threatIndicator');
+            const level = document.getElementById('threatLevel');
+            
+            if (analysis.status === 'error') {
+                indicator.className = 'threat-indicator threat-medium';
+                level.textContent = 'Analysis Error';
+                return;
+            }
+            
+            if (analysis.riskScore >= 70) {
+                indicator.className = 'threat-indicator threat-high';
+                level.textContent = 'High Risk Detected';
+            } else if (analysis.riskScore >= 30) {
+                indicator.className = 'threat-indicator threat-medium';
+                level.textContent = 'Medium Risk';
+            } else {
+                indicator.className = 'threat-indicator threat-low';
+                level.textContent = 'Low Risk';
+            }
+        }
+
+        function showAnalysisResult(analysis) {
+            const result = document.getElementById('analysisResult');
+            
+            if (analysis.status === 'error') {
+                result.className = 'analysis-result analysis-danger';
+                result.textContent = analysis.message || 'Analysis failed';
+            } else if (analysis.riskScore >= 70) {
+                result.className = 'analysis-result analysis-danger';
+                result.textContent = `High risk email detected (${analysis.riskScore}% risk). Threats: ${analysis.threats.join(', ') || 'Generic threats'}`;
+            } else if (analysis.riskScore >= 30) {
+                result.className = 'analysis-result analysis-warning';
+                result.textContent = `Medium risk email (${analysis.riskScore}% risk). Please review carefully.`;
+            } else {
+                result.className = 'analysis-result analysis-safe';
+                result.textContent = `Email appears safe (${analysis.riskScore}% risk). No significant threats detected.`;
+            }
+            
+            result.style.display = 'block';
+            updateThreatLevel(analysis);
+        }
+    </script>
+</body>
+</html>

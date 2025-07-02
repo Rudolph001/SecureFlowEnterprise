@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <title>SecureFlow Commands</title>
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+</head>
+
+<body>
+    <script>
+        Office.onReady(() => {
+            console.log('SecureFlow Commands loaded');
+        });
+
+        async function scanEmail(event) {
+            try {
+                // Get current email content
+                Office.context.mailbox.item.body.getAsync("text", async (result) => {
+                    if (result.status === Office.AsyncResultStatus.Succeeded) {
+                        const emailData = {
+                            subject: Office.context.mailbox.item.subject || '',
+                            body: result.value || '',
+                            sender: Office.context.mailbox.item.from?.emailAddress || 'unknown',
+                            recipients: Office.context.mailbox.item.to?.map(r => r.emailAddress) || []
+                        };
+
+                        // Analyze email for threats
+                        const threats = detectThreats(emailData);
+                        const riskScore = calculateRiskScore(emailData);
+
+                        // Send analysis to SecureFlow backend
+                        try {
+                            const response = await fetch('/api/email-events', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    userId: 1,
+                                    eventType: 'quick_scan',
+                                    subject: emailData.subject,
+                                    sender: emailData.sender,
+                                    recipients: emailData.recipients,
+                                    riskScore: riskScore,
+                                    threatTypes: threats,
+                                    action: 'scanned'
+                                })
+                            });
+
+                            if (response.ok) {
+                                // Show notification based on risk level
+                                if (riskScore >= 70) {
+                                    Office.context.mailbox.item.notificationMessages.addAsync("secureflow-warning", {
+                                        type: "errorMessage",
+                                        message: `⚠️ HIGH RISK EMAIL DETECTED (${riskScore}% risk) - ${threats.join(', ')}`
+                                    });
+                                } else if (riskScore >= 30) {
+                                    Office.context.mailbox.item.notificationMessages.addAsync("secureflow-caution", {
+                                        type: "informationalMessage",
+                                        message: `⚠️ MEDIUM RISK EMAIL (${riskScore}% risk) - Please review carefully`
+                                    });
+                                } else {
+                                    Office.context.mailbox.item.notificationMessages.addAsync("secureflow-safe", {
+                                        type: "informationalMessage",
+                                        message: `✓ Email appears safe (${riskScore}% risk)`
+                                    });
+                                }
+                            }
+                        } catch (apiError) {
+                            console.error('API call failed:', apiError);
+                            Office.context.mailbox.item.notificationMessages.addAsync("secureflow-error", {
+                                type: "errorMessage",
+                                message: "SecureFlow: Unable to connect to security service"
+                            });
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Email scan failed:', error);
+                Office.context.mailbox.item.notificationMessages.addAsync("secureflow-error", {
+                    type: "errorMessage",
+                    message: "SecureFlow: Scan failed - " + error.message
+                });
+            }
+
+            // Signal that the function is complete
+            event.completed();
+        }
+
+        function detectThreats(emailData) {
+            const threats = [];
+            const body = emailData.body.toLowerCase();
+            const subject = emailData.subject.toLowerCase();
+            
+            // Phishing detection
+            if (body.includes('urgent') || body.includes('verify account') || body.includes('suspended')) {
+                threats.push('phishing');
+            }
+            
+            // Suspicious link detection
+            if (body.includes('http://') || body.match(/bit\.ly|tinyurl|t\.co|goo\.gl/)) {
+                threats.push('suspicious_links');
+            }
+            
+            // Financial fraud detection
+            if (body.includes('bank') || body.includes('payment') || body.includes('credit card') || body.includes('transfer money')) {
+                threats.push('financial_fraud');
+            }
+            
+            // Social engineering detection
+            if (body.includes('click here') || body.includes('download now') || body.includes('act now')) {
+                threats.push('social_engineering');
+            }
+            
+            // Malware indicators
+            if (body.includes('invoice.exe') || body.includes('.zip') || body.includes('document.pdf.exe')) {
+                threats.push('malware');
+            }
+            
+            return threats;
+        }
+
+        function calculateRiskScore(emailData) {
+            let score = 0;
+            const body = emailData.body.toLowerCase();
+            const subject = emailData.subject.toLowerCase();
+            const sender = emailData.sender.toLowerCase();
+            
+            // High-risk indicators
+            if (body.includes('urgent') || subject.includes('urgent')) score += 25;
+            if (body.includes('verify') || body.includes('confirm')) score += 20;
+            if (body.includes('suspended') || body.includes('locked')) score += 35;
+            if (body.includes('click here immediately') || body.includes('act now')) score += 30;
+            if (body.includes('wire transfer') || body.includes('bitcoin')) score += 40;
+            
+            // Medium-risk indicators
+            if (body.includes('account') && body.includes('problem')) score += 15;
+            if (body.includes('security') && body.includes('update')) score += 15;
+            if (body.includes('download') || body.includes('attachment')) score += 10;
+            if (subject.includes('re:') && !body.includes('previous message')) score += 10;
+            
+            // Sender analysis
+            if (!sender.includes(Office.context.mailbox.userProfile.emailAddress.split('@')[1])) {
+                score += 5; // External sender
+            }
+            if (sender.includes('noreply') || sender.includes('no-reply')) {
+                score += 10;
+            }
+            
+            // URL analysis
+            const urlCount = (body.match(/http[s]?:\/\/[^\s]+/g) || []).length;
+            if (urlCount > 3) score += 15;
+            
+            return Math.min(score, 100);
+        }
+
+        // Make function available globally
+        window.scanEmail = scanEmail;
+    </script>
+</body>
+</html>

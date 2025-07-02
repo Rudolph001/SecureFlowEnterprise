@@ -309,6 +309,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Outlook add-in routes
+  app.get('/outlook-addin/manifest.xml', (req, res) => {
+    res.setHeader('Content-Type', 'application/xml');
+    res.sendFile(process.cwd() + '/outlook-com-addin/manifest.xml');
+  });
+
+  app.get('/outlook-addin/taskpane.html', (req, res) => {
+    res.sendFile(process.cwd() + '/outlook-com-addin/taskpane.html');
+  });
+
+  app.get('/outlook-addin/commands.html', (req, res) => {
+    res.sendFile(process.cwd() + '/outlook-com-addin/commands.html');
+  });
+
+  app.get('/outlook-addin/icon-16.png', (req, res) => {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.sendFile(process.cwd() + '/outlook-com-addin/assets/icon-16.svg');
+  });
+
+  app.get('/outlook-addin/icon-32.png', (req, res) => {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.sendFile(process.cwd() + '/outlook-com-addin/assets/icon-32.svg');
+  });
+
+  app.get('/outlook-addin/icon-80.png', (req, res) => {
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.sendFile(process.cwd() + '/outlook-com-addin/assets/icon-80.svg');
+  });
+
   // SIEM integration endpoint
   app.post('/api/siem/events', authenticateUser, async (req: AuthenticatedRequest, res) => {
     try {
@@ -363,7 +392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/policies", async (req, res) => {
     try {
       const tenantId = req.headers['x-tenant-id'] || '1';
-      const policies = await storage.getSecurityPoliciesByTenant(tenantId as string);
+      const policies = await storage.getPoliciesByTenant(parseInt(tenantId as string));
       res.json(policies);
     } catch (error) {
       console.error('Error fetching policies:', error);
