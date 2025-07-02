@@ -129,6 +129,17 @@ export const systemMetrics = pgTable("system_metrics", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
+// Domain allow list
+export const domainAllowList = pgTable("domain_allow_list", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  domain: text("domain").notNull(),
+  addedBy: integer("added_by").references(() => users.id),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Create insert schemas
 export const insertTenantSchema = createInsertSchema(tenants).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true, lastLogin: true });
@@ -139,6 +150,7 @@ export const insertMlModelSchema = createInsertSchema(mlModels).omit({ id: true,
 export const insertBehaviorProfileSchema = createInsertSchema(behaviorProfiles).omit({ id: true, lastUpdated: true });
 export const insertAlertSchema = createInsertSchema(alerts).omit({ id: true, createdAt: true });
 export const insertSystemMetricSchema = createInsertSchema(systemMetrics).omit({ id: true, timestamp: true });
+export const insertDomainAllowListSchema = createInsertSchema(domainAllowList).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type Tenant = typeof tenants.$inferSelect;
@@ -150,6 +162,7 @@ export type MlModel = typeof mlModels.$inferSelect;
 export type BehaviorProfile = typeof behaviorProfiles.$inferSelect;
 export type Alert = typeof alerts.$inferSelect;
 export type SystemMetric = typeof systemMetrics.$inferSelect;
+export type DomainAllowList = typeof domainAllowList.$inferSelect;
 
 export type InsertTenant = z.infer<typeof insertTenantSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -160,6 +173,7 @@ export type InsertMlModel = z.infer<typeof insertMlModelSchema>;
 export type InsertBehaviorProfile = z.infer<typeof insertBehaviorProfileSchema>;
 export type InsertAlert = z.infer<typeof insertAlertSchema>;
 export type InsertSystemMetric = z.infer<typeof insertSystemMetricSchema>;
+export type InsertDomainAllowList = z.infer<typeof insertDomainAllowListSchema>;
 
 export interface SecurityPolicy {
   id: number;

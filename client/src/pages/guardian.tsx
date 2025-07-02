@@ -172,6 +172,35 @@ export default function Guardian() {
     }
   };
 
+  const handleAddToAllowList = async (recipient: string) => {
+    try {
+      const domain = recipient.split('@')[1];
+      const response = await fetch('/api/domain-allow-list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ domain }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "✅ Domain Added to Allow List",
+          description: `Domain "${domain}" has been added to the allow list. Future emails to this domain will be trusted.`,
+          duration: 5000,
+        });
+      } else {
+        throw new Error('Failed to add domain');
+      }
+    } catch (error) {
+      toast({
+        title: "❌ Failed to Add Domain",
+        description: "Could not add domain to allow list. Please try again or contact your administrator.",
+        duration: 5000,
+      });
+    }
+  };
+
   return (
     <>
       <Header
@@ -571,6 +600,17 @@ export default function Guardian() {
                               <div className="flex items-center space-x-2">
                                 <i className="fas fa-times-circle text-red-500"></i>
                                 <span className="text-sm">Flagged as competitor</span>
+                              </div>
+                              <div className="mt-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => handleAddToAllowList(selectedEmail.recipient)}
+                                  className="text-xs"
+                                >
+                                  <i className="fas fa-plus mr-1"></i>
+                                  Add Domain to Allow List
+                                </Button>
                               </div>
                             </div>
                           </div>

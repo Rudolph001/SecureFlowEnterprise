@@ -400,6 +400,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Domain Allow List routes
+  app.get('/api/domain-allow-list', authenticateUser, async (req: AuthenticatedRequest, res) => {
+    try {
+      const domains = await storage.getDomainAllowList(req.user!.tenantId);
+      res.json(domains);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch domain allow list' });
+    }
+  });
+
+  app.post('/api/domain-allow-list', authenticateUser, requireRole(['admin', 'security_admin']), async (req: AuthenticatedRequest, res) => {
+    try {
+      const { domain } = req.body;
+      if (!domain) {
+        return res.status(400).json({ message: 'Domain is required' });
+      }
+
+      const allowListEntry = await storage.addDomainToAllowList(
+        req.user!.tenantId, 
+        domain, 
+        req.user!.id
+      );
+      res.status(201).json(allowListEntry);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to add domain to allow list' });
+    }
+  });
+
+  app.delete('/api/domain-allow-list/:domain', authenticateUser, requireRole(['admin', 'security_admin']), async (req: AuthenticatedRequest, res) => {
+    try {
+      const { domain } = req.params;
+      const success = await storage.removeDomainFromAllowList(req.user!.tenantId, domain);
+      
+      if (!success) {
+        return res.status(404).json({ message: 'Domain not found in allow list' });
+      }
+
+      res.json({ message: 'Domain removed from allow list successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to remove domain from allow list' });
+    }
+  });
+
   // Policy justification submission
   app.post("/api/policies/justification", async (req, res) => {
     try {

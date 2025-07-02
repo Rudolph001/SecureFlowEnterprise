@@ -497,6 +497,63 @@ export class MemStorage implements IStorage {
     let metrics = Array.from(this.systemMetrics.values());
     if (metricType) {
       metrics = metrics.filter(metric => metric.metricType === metricType);
+
+
+// Domain Allow List Management
+export async function getDomainAllowList(tenantId: number) {
+  try {
+    const result = await db.select().from(domainAllowList).where(eq(domainAllowList.tenantId, tenantId));
+    return result;
+  } catch (error) {
+    console.error('Error fetching domain allow list:', error);
+    return [];
+  }
+}
+
+export async function addDomainToAllowList(tenantId: number, domain: string, addedBy: number) {
+  try {
+    const [allowListEntry] = await db.insert(domainAllowList).values({
+      tenantId,
+      domain: domain.toLowerCase(),
+      addedBy,
+      isActive: true,
+    }).returning();
+    return allowListEntry;
+  } catch (error) {
+    console.error('Error adding domain to allow list:', error);
+    throw error;
+  }
+}
+
+export async function removeDomainFromAllowList(tenantId: number, domain: string) {
+  try {
+    await db.delete(domainAllowList)
+      .where(and(
+        eq(domainAllowList.tenantId, tenantId),
+        eq(domainAllowList.domain, domain.toLowerCase())
+      ));
+    return true;
+  } catch (error) {
+    console.error('Error removing domain from allow list:', error);
+    return false;
+  }
+}
+
+export async function isDomainAllowed(tenantId: number, domain: string) {
+  try {
+    const result = await db.select().from(domainAllowList)
+      .where(and(
+        eq(domainAllowList.tenantId, tenantId),
+        eq(domainAllowList.domain, domain.toLowerCase()),
+        eq(domainAllowList.isActive, true)
+      ));
+    return result.length > 0;
+  } catch (error) {
+    console.error('Error checking domain allow list:', error);
+    return false;
+  }
+}
+
     }
     return metrics
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
