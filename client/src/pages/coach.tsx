@@ -583,19 +583,59 @@ export default function Coach() {
                     <CardContent>
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <Button variant="default" className="h-16 flex-col">
+                          <Button 
+                            variant="default" 
+                            className="h-16 flex-col"
+                            onClick={() => {
+                              toast({
+                                title: "🎓 Advanced Training Assigned",
+                                description: `Advanced Social Engineering Defense module assigned to ${selectedTraining.user}. Estimated completion: 20 minutes.`,
+                                duration: 4000,
+                              });
+                            }}
+                          >
                             <i className="fas fa-graduation-cap mb-1"></i>
                             Advanced Training Module
                           </Button>
-                          <Button variant="outline" className="h-16 flex-col">
+                          <Button 
+                            variant="outline" 
+                            className="h-16 flex-col"
+                            onClick={() => {
+                              toast({
+                                title: "🔄 Simulation Scheduled",
+                                description: `Phishing simulation retake scheduled for ${selectedTraining.user} next week with enhanced difficulty.`,
+                                duration: 4000,
+                              });
+                            }}
+                          >
                             <i className="fas fa-redo mb-1"></i>
                             Retake Simulation
                           </Button>
-                          <Button variant="outline" className="h-16 flex-col">
+                          <Button 
+                            variant="outline" 
+                            className="h-16 flex-col"
+                            onClick={() => {
+                              toast({
+                                title: "👥 Team Discussion Initiated",
+                                description: `Security awareness discussion scheduled with ${selectedTraining.user}'s team for next Tuesday.`,
+                                duration: 4000,
+                              });
+                            }}
+                          >
                             <i className="fas fa-users mb-1"></i>
                             Team Discussion
                           </Button>
-                          <Button variant="outline" className="h-16 flex-col">
+                          <Button 
+                            variant="outline" 
+                            className="h-16 flex-col"
+                            onClick={() => {
+                              toast({
+                                title: "📅 Follow-up Scheduled",
+                                description: `30-day progress review scheduled for ${selectedTraining.user} on ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}.`,
+                                duration: 4000,
+                              });
+                            }}
+                          >
                             <i className="fas fa-calendar mb-1"></i>
                             Schedule Follow-up
                           </Button>
